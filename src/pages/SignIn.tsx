@@ -1,211 +1,491 @@
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Button, 
-  TextField, 
-  Typography, 
-  Paper, 
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
   InputAdornment,
   IconButton,
   Divider,
   Link,
   Alert,
-  CircularProgress
-} from '@mui/material';
-import { 
-  Email as EmailIcon, 
-  Lock as LockIcon, 
-  Visibility, 
+  CircularProgress,
+  Stack,
+  Grid,
+  useTheme,
+  alpha,
+  useMediaQuery,
+} from "@mui/material"
+import {
+  Email as EmailIcon,
+  Lock as LockIcon,
+  Visibility,
   VisibilityOff,
-  Google as GoogleIcon
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+  Google as GoogleIcon,
+  AccountBalance as AccountBalanceIcon,
+} from "@mui/icons-material"
+import { useNavigate } from "react-router-dom"
 
 const SignIn: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const navigate = useNavigate()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    
+    e.preventDefault()
+    setLoading(true)
+    setError("")
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert(`Sign In: ${email}`);
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      alert(`Sign In: ${email}`)
     } catch (err) {
-      setError('Invalid email or password');
+      setError("Invalid email or password")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleGoogleSignIn = () => {
     // Google sign in logic
-    alert('Google Sign In clicked');
-  };
+    alert("Google Sign In clicked")
+  }
 
   return (
-    <Box 
-      maxWidth='lg'
-      width="100%" 
-      display="flex" 
-      justifyContent="center" 
-      alignItems="center" 
-      minHeight="60vh"
-      px={2}
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: { xs: 480, md: 1000 },
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        px: 2,
+      }}
     >
-      <Paper 
-        elevation={8} 
-        sx={{ 
-          p: { xs: 3, md: 4 }, 
-          maxWidth: 450, 
-          width: '100%', 
-          borderRadius: 3,
-          bgcolor: 'background.paper',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+      {/* Main Container */}
+      <Box
+        sx={{
+          width: "100%",
+          backgroundColor: alpha(theme.palette.background.paper, 0.7),
+          backdropFilter: "blur(20px)",
+          borderRadius: 2,
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          boxShadow: `0 12px 40px ${alpha(theme.palette.common.black, 0.1)}`,
+          overflow: "hidden",
+          position: "relative",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 4,
+            background: `linear-gradient(90deg, ${theme.palette.success.main} 0%, ${theme.palette.primary.main} 50%, ${theme.palette.secondary.main} 100%)`,
+          },
         }}
       >
-        <Box textAlign="center" mb={3}>
-          <Typography variant="h4" fontWeight={700} color="text.primary" gutterBottom>
-            Welcome Back
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Sign in to your account to continue
-          </Typography>
-        </Box>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        <Box component="form" onSubmit={handleSubmit}>
-          <TextField
-            size="small"
-            label="Email Address"
-            type="email"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon color="action" fontSize='small' />
-                </InputAdornment>
-              ),
-            }}
-            sx={{ mb: 2 }}
-          />
-          
-          <TextField
-            size="small"
-            label="Password"
-            type={showPassword ? 'text' : 'password'}
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon color="action" fontSize='small' />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-            sx={{ mb: 3 }}
-          />
-
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary" 
-            fullWidth 
-            size="large"
-            disabled={loading}
-            sx={{ 
-              mb: 2,
-              py: 1.5,
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              borderRadius: 2,
-              textTransform: 'none'
+        <Grid
+          container
+          spacing={0}
+          direction="row"
+          sx={{
+            minHeight: { xs: "auto", md: "600px" },
+            width: "100%",
+            margin: 0,
+            display: "flex",
+            flexWrap: "wrap",
+          }}
+        >
+          {/* Left Section - Header/Branding */}
+          <Grid size={{ xs: 12, md: 5 }}
+            sx={{
+              background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.12)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              p: { xs: 3, md: 6 },
+              textAlign: "center",
+              position: "relative",
+              minHeight: { xs: "200px", md: "600px" },
+              flex: { xs: "1 1 100%", md: "1 1 41.666667%" }, // Explicit flex for 5/12 width
+              maxWidth: { xs: "100%", md: "41.666667%" },
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: isMobile
+                  ? "none"
+                  : `radial-gradient(circle at center, ${alpha(theme.palette.success.main, 0.15)} 0%, transparent 70%)`,
+                pointerEvents: "none",
+              },
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
-          </Button>
+            {/* Logo */}
+            <Box
+              sx={{
+                width: { xs: 50, md: 100 },
+                height: { xs: 50, md: 100 },
+                borderRadius: { xs: 2, md: 4 },
+                background: `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: { xs: 1.5, md: 4 },
+                boxShadow: `0 12px 40px ${alpha(theme.palette.success.main, 0.4)}`,
+                animation: !isMobile ? "pulse 3s ease-in-out infinite alternate" : "none",
+                "@keyframes pulse": {
+                  "0%": {
+                    transform: "scale(1)",
+                    boxShadow: `0 12px 40px ${alpha(theme.palette.success.main, 0.4)}`,
+                  },
+                  "100%": {
+                    transform: "scale(1.05)",
+                    boxShadow: `0 16px 50px ${alpha(theme.palette.success.main, 0.5)}`,
+                  },
+                },
+              }}
+            >
+              <AccountBalanceIcon sx={{ fontSize: { xs: 24, md: 50 }, color: "white" }} />
+            </Box>
 
-          <Divider sx={{ my: 2 }}>
-            <Typography variant="body2" color="text.secondary">
-              OR
+            {/* Welcome Text */}
+            <Typography
+              variant={isMobile ? "h6" : "h3"}
+              sx={{
+                fontWeight: 700,
+                background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette.success.dark} 90%)`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                lineHeight: 1.2,
+                mb: { xs: 1, md: 3 },
+              }}
+            >
+              Welcome Back
             </Typography>
-          </Divider>
 
-          <Button
-            variant="outlined"
-            fullWidth
-            size="large"
-            onClick={handleGoogleSignIn}
-            startIcon={<GoogleIcon />}
-            sx={{ 
-              mb: 3,
-              py: 1.5,
-              borderRadius: 2,
-              textTransform: 'none',
-              borderColor: 'grey.300',
-              color: 'text.primary',
-              '&:hover': {
-                borderColor: 'grey.400',
-                backgroundColor: 'rgba(255,255,255,0.08)',
-                backdropFilter: 'blur(10px)'
-              }
-            }}
-          >
-            Continue with Google
-          </Button>
+            <Typography
+              variant={isMobile ? "body2" : "h5"}
+              sx={{
+                color: theme.palette.text.secondary,
+                fontWeight: 400,
+                mb: { xs: 1, md: 2 },
+                fontSize: { xs: "0.875rem", md: "1.5rem" },
+              }}
+            >
+              Sign in to your budget tracker
+            </Typography>
 
-          <Box textAlign="center">
-            <Typography variant="body2" color="text.secondary">
-              Don't have an account?{' '}
-              <Link 
-                component="button"
-                variant="body2"
-                onClick={() => navigate('/signup')}
-                sx={{ 
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  '&:hover': {
-                    textDecoration: 'underline'
-                  }
+            {!isMobile && (
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  opacity: 0.8,
+                  maxWidth: "320px",
+                  lineHeight: 1.6,
+                  fontSize: "1.1rem",
                 }}
               >
-                Sign Up
-              </Link>
-            </Typography>
-          </Box>
-        </Box>
-      </Paper>
-    </Box>
-  );
-};
+                Continue managing your financial goals and track your expenses with ease
+              </Typography>
+            )}
 
-export default SignIn; 
+            {/* Decorative Elements for Desktop Only */}
+            {!isMobile && (
+              <>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "20%",
+                    right: "10%",
+                    width: 80,
+                    height: 80,
+                    borderRadius: "50%",
+                    background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
+                    filter: "blur(25px)",
+                    animation: "float 4s ease-in-out infinite",
+                    "@keyframes float": {
+                      "0%, 100%": { transform: "translateY(0px)" },
+                      "50%": { transform: "translateY(-15px)" },
+                    },
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: "25%",
+                    left: "15%",
+                    width: 60,
+                    height: 60,
+                    borderRadius: "50%",
+                    background: `linear-gradient(45deg, ${alpha(theme.palette.warning.main, 0.2)}, ${alpha(theme.palette.success.main, 0.1)})`,
+                    filter: "blur(20px)",
+                    animation: "float 6s ease-in-out infinite reverse",
+                  }}
+                />
+              </>
+            )}
+          </Grid>
+
+          {/* Right Section - Form */}
+          <Grid size={{ xs: 12, md: 7 }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              p: { xs: 3, md: 6 },
+              minHeight: { xs: "auto", md: "600px" },
+              flex: { xs: "1 1 100%", md: "1 1 58.333333%" }, // Explicit flex for 7/12 width
+              maxWidth: { xs: "100%", md: "58.333333%" },
+            }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                maxWidth: "400px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              {/* Error Alert */}
+              {error && (
+                <Alert
+                  severity="error"
+                  sx={{
+                    mb: 4,
+                    width: "100%",
+                    borderRadius: 2,
+                    backgroundColor: alpha(theme.palette.error.main, 0.1),
+                    border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+                    fontSize: "1rem",
+                  }}
+                >
+                  {error}
+                </Alert>
+              )}
+
+              {/* Form */}
+              <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+                <Stack spacing={4} sx={{ width: "100%" }}>
+                  <TextField
+                    label="Email Address"
+                    type="email"
+                    fullWidth
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <EmailIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                        fontSize: "1rem",
+                        height: "48px",
+                        "&:hover": {
+                          backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                        },
+                        "&.Mui-focused": {
+                          backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: theme.palette.success.main,
+                            borderWidth: 2,
+                          },
+                        },
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "1rem",
+                        "&.Mui-focused": {
+                          color: theme.palette.success.main,
+                        },
+                      },
+                    }}
+                  />
+
+                  <TextField
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    fullWidth
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LockIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                        </InputAdornment>
+                      ),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                            {showPassword ? (
+                              <VisibilityOff sx={{ fontSize: 20 }} />
+                            ) : (
+                              <Visibility sx={{ fontSize: 20 }} />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: 2,
+                        backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                        fontSize: "1rem",
+                        height: "48px",
+                        "&:hover": {
+                          backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                        },
+                        "&.Mui-focused": {
+                          backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: theme.palette.success.main,
+                            borderWidth: 2,
+                          },
+                        },
+                      },
+                      "& .MuiInputLabel-root": {
+                        fontSize: "1rem",
+                        "&.Mui-focused": {
+                          color: theme.palette.success.main,
+                        },
+                      },
+                    }}
+                  />
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    disabled={loading}
+                    sx={{
+                      py: 1.5,
+                      fontSize: "1.1rem",
+                      fontWeight: 600,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      backgroundColor: theme.palette.success.main,
+                      boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.3)}`,
+                      "&:hover": {
+                        backgroundColor: theme.palette.success.dark,
+                        transform: "translateY(-2px)",
+                        boxShadow: `0 8px 25px ${alpha(theme.palette.success.main, 0.4)}`,
+                      },
+                      "&:disabled": {
+                        backgroundColor: alpha(theme.palette.success.main, 0.6),
+                      },
+                      transition: "all 0.3s ease-in-out",
+                    }}
+                  >
+                    {loading ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
+                  </Button>
+
+                  <Divider
+                    sx={{
+                      "&::before, &::after": {
+                        borderColor: alpha(theme.palette.divider, 0.3),
+                      },
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        px: 3,
+                        backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                        borderRadius: 1,
+                        fontSize: "1rem",
+                      }}
+                    >
+                      OR
+                    </Typography>
+                  </Divider>
+
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    onClick={handleGoogleSignIn}
+                    startIcon={<GoogleIcon sx={{ fontSize: 20 }} />}
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 2,
+                      textTransform: "none",
+                      fontSize: "1rem",
+                      borderColor: alpha(theme.palette.divider, 0.3),
+                      color: theme.palette.text.primary,
+                      backgroundColor: alpha(theme.palette.background.paper, 0.3),
+                      "&:hover": {
+                        borderColor: theme.palette.primary.main,
+                        backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                        transform: "translateY(-1px)",
+                        boxShadow: `0 6px 15px ${alpha(theme.palette.primary.main, 0.2)}`,
+                      },
+                      transition: "all 0.3s ease-in-out",
+                    }}
+                  >
+                    Continue with Google
+                  </Button>
+                </Stack>
+              </Box>
+
+              {/* Footer */}
+              <Box
+                sx={{
+                  textAlign: "center",
+                  mt: 5,
+                  pt: 4,
+                  borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  width: "100%",
+                }}
+              >
+                <Typography variant="body1" sx={{ color: theme.palette.text.secondary, fontSize: "1rem" }}>
+                  Don't have an account?{" "}
+                  <Link
+                    component="button"
+                    variant="body1"
+                    onClick={() => navigate("/signup")}
+                    sx={{
+                      color: theme.palette.success.main,
+                      textDecoration: "none",
+                      fontWeight: 600,
+                      fontSize: "1rem",
+                      "&:hover": {
+                        textDecoration: "underline",
+                        color: theme.palette.success.dark,
+                      },
+                      transition: "color 0.2s ease-in-out",
+                    }}
+                  >
+                    Sign Up
+                  </Link>
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
+  )
+}
+
+export default SignIn

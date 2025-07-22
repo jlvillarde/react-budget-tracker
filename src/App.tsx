@@ -1,18 +1,18 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import type { RouteObject } from 'react-router-dom';
-import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import { ThemeProvider } from './context/ThemeContext';
 import LandingPageLayout from './layouts/LandingPageLayout';
+import BudgetPlannerLanding from './pages/BudgetPlannerLanding';
 
 const routes: RouteObject[] = [
   {
     path: '/',
     element: <LandingPageLayout />,
     children: [
-      { index: true, element: <Home /> },
+      { index: true, element: <BudgetPlannerLanding /> },
       { path: 'signin', element: <SignIn /> },
       { path: 'signup', element: <SignUp /> },
     ],

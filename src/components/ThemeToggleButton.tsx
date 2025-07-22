@@ -7,8 +7,8 @@ import { useThemeContext } from '../context/ThemeContext';
 const ThemeToggleButton: React.FC = () => {
   const { mode, toggleColorMode } = useThemeContext();
   return (
-    <IconButton 
-      sx={{ 
+    <IconButton
+      sx={{
         ml: 2,
         '&:focus': {
           outline: 'none',
@@ -28,4 +28,4 @@ const ThemeToggleButton: React.FC = () => {
   );
 };
 
-export default ThemeToggleButton; 
+export default ThemeToggleButton;
