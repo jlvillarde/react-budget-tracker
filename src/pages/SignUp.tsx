@@ -71,13 +71,13 @@ const SignUp: React.FC = () => {
     setLoading(true)
     setError("")
     try {
-      const response = await fetch("/api/user", {
+      const response = await fetch("/api/signup", {
         method: "POST",
         body: JSON.stringify(formData),
         headers: { "Content-Type": "application/json" },
       })
       if (response.ok) {
-        alert(`Sign Up: ${formData.email}`)
+        navigate("/dashboard");
       }
     } catch (err) {
       setError("Failed to create account. Please try again.")

@@ -9,7 +9,6 @@ import {
   Typography,
   InputAdornment,
   IconButton,
-  // Divider,
   Link,
   Alert,
   CircularProgress,
@@ -24,10 +23,10 @@ import {
   Lock as LockIcon,
   Visibility,
   VisibilityOff,
-  // Google as GoogleIcon,
   AccountBalance as AccountBalanceIcon,
 } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
+import { useUser } from "../context/UserContext"
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("")
@@ -38,6 +37,7 @@ const SignIn: React.FC = () => {
   const navigate = useNavigate()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+  const { login } = useUser()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,30 +45,27 @@ const SignIn: React.FC = () => {
     setError("")
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        credentials: "include", // Include cookies for session
+        body: JSON.stringify({ email, password }),
       })
 
       if (response.ok) {
-        // In case your backend returns 200 with success JSON
-        navigate("/dashboard");
+        const userData = await response.json()
+        login(userData) // Update user context
+        navigate("/dashboard/expenses")
       } else {
-        setError("Invalid email or password");
+        const errorData = await response.json()
+        setError(errorData.message || "Invalid email or password")
       }
-
     } catch (err) {
       setError("Invalid email or password")
     } finally {
       setLoading(false)
     }
   }
-
-  // const handleGoogleSignIn = () => {
-  //   // Google sign in logic
-  //   alert("Google Sign In clicked")
-  // }
 
   return (
     <Box
@@ -116,7 +113,8 @@ const SignIn: React.FC = () => {
           }}
         >
           {/* Left Section - Header/Branding */}
-          <Grid size={{ xs: 12, md: 5 }}
+          <Grid
+            size={{ xs: 12, md: 5 }}
             sx={{
               background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.12)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`,
               display: "flex",
@@ -252,7 +250,8 @@ const SignIn: React.FC = () => {
           </Grid>
 
           {/* Right Section - Form */}
-          <Grid size={{ xs: 12, md: 7 }}
+          <Grid
+            size={{ xs: 12, md: 7 }}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -409,52 +408,6 @@ const SignIn: React.FC = () => {
                   >
                     {loading ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
                   </Button>
-
-                  {/* <Divider
-                    sx={{
-                      "&::before, &::after": {
-                        borderColor: alpha(theme.palette.divider, 0.3),
-                      },
-                    }}
-                  >
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: theme.palette.text.secondary,
-                        px: 3,
-                        backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                        borderRadius: 1,
-                        fontSize: "1rem",
-                      }}
-                    >
-                      OR
-                    </Typography>
-                  </Divider> */}
-
-                  {/* <Button
-                    variant="outlined"
-                    fullWidth
-                    onClick={handleGoogleSignIn}
-                    startIcon={<GoogleIcon sx={{ fontSize: 20 }} />}
-                    sx={{
-                      py: 1.5,
-                      borderRadius: 2,
-                      textTransform: "none",
-                      fontSize: "1rem",
-                      borderColor: alpha(theme.palette.divider, 0.3),
-                      color: theme.palette.text.primary,
-                      backgroundColor: alpha(theme.palette.background.paper, 0.3),
-                      "&:hover": {
-                        borderColor: theme.palette.primary.main,
-                        backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                        transform: "translateY(-1px)",
-                        boxShadow: `0 6px 15px ${alpha(theme.palette.primary.main, 0.2)}`,
-                      },
-                      transition: "all 0.3s ease-in-out",
-                    }}
-                  > */}
-                  {/* Continue with Google */}
-                  {/* </Button> */}
                 </Stack>
               </Box>
 
@@ -494,7 +447,7 @@ const SignIn: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
-    </Box >
+    </Box>
   )
 }
 

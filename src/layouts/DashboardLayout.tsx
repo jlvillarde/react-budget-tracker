@@ -41,6 +41,7 @@ import {
 } from "@mui/icons-material"
 import { Outlet, useNavigate, useLocation } from "react-router-dom"
 import { useThemeContext } from "../context/ThemeContext"
+import { useUser } from "../context/UserContext"
 
 const navigationItems = [
     {
@@ -49,14 +50,14 @@ const navigationItems = [
         path: "/dashboard",
     },
     {
+        text: "Expenses",
+        icon: <ReceiptIcon />,
+        path: "/dashboard/expenses",
+    },
+    {
         text: "Categories",
         icon: <CategoryIcon />,
         path: "/dashboard/categories",
-    },
-    {
-        text: "Transactions",
-        icon: <ReceiptIcon />,
-        path: "/dashboard/transactions",
     },
     {
         text: "Analytics",
@@ -74,6 +75,8 @@ const DashboardLayout: React.FC = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
     const theme = useTheme()
     const { mode, toggleColorMode } = useThemeContext()
+    const { user, logoutUser } = useUser()
+    const logout = logoutUser
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -103,13 +106,27 @@ const DashboardLayout: React.FC = () => {
         setNotificationAnchor(null)
     }
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         handleProfileMenuClose()
-        navigate("/signin")
+        await logout()
     }
 
     const handleSidebarToggle = () => {
         setSidebarCollapsed(!sidebarCollapsed)
+    }
+
+    // Get user initials for avatar
+    const getUserInitials = () => {
+        if (!user) return "U"
+        const firstInitial = user.firstname && user.firstname.length > 0 ? user.firstname[0] : ""
+        const lastInitial = user.lastname && user.lastname.length > 0 ? user.lastname[0] : ""
+        if (firstInitial || lastInitial) {
+            return `${firstInitial}${lastInitial}`.toUpperCase()
+        }
+        if (user.email && user.email.length > 0) {
+            return user.email[0].toUpperCase()
+        }
+        return "U"
     }
 
     const drawer = (
@@ -392,8 +409,9 @@ const DashboardLayout: React.FC = () => {
                                     fontSize: "1rem",
                                     fontWeight: 600,
                                 }}
+                                src={user?.avatar}
                             >
-                                JD
+                                {getUserInitials()}
                             </Avatar>
                         </IconButton>
                     </Box>
@@ -439,24 +457,26 @@ const DashboardLayout: React.FC = () => {
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
                 <MenuItem onClick={handleProfileMenuClose}>
-                    <Avatar sx={{ backgroundColor: theme.palette.success.main }} />
+                    <Avatar sx={{ backgroundColor: theme.palette.success.main }} src={user?.avatar}>
+                        {getUserInitials()}
+                    </Avatar>
                     <Box>
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            John Doe
+                            {user ? `${user.firstname} ${user.lastname}` : "User"}
                         </Typography>
                         <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            john.doe@example.com
+                            {user?.email || "user@example.com"}
                         </Typography>
                     </Box>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleProfileMenuClose}>
+                <MenuItem onClick={() => navigate("/dashboard/settings")}>
                     <ListItemIcon>
                         <AccountCircle fontSize="small" />
                     </ListItemIcon>
                     Profile
                 </MenuItem>
-                <MenuItem onClick={handleProfileMenuClose}>
+                <MenuItem onClick={() => navigate("/dashboard/settings")}>
                     <ListItemIcon>
                         <SettingsIcon fontSize="small" />
                     </ListItemIcon>
@@ -499,7 +519,7 @@ const DashboardLayout: React.FC = () => {
                             Budget Alert
                         </Typography>
                         <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            You've exceeded your dining budget by $30
+                            You've exceeded your dining budget by ₱30
                         </Typography>
                     </Box>
                 </MenuItem>
@@ -509,7 +529,7 @@ const DashboardLayout: React.FC = () => {
                             New Transaction
                         </Typography>
                         <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            $45.99 spent at Grocery Store
+                            ₱45.99 spent at Grocery Store
                         </Typography>
                     </Box>
                 </MenuItem>
