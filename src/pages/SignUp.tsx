@@ -9,7 +9,7 @@ import {
   Typography,
   InputAdornment,
   IconButton,
-  Divider,
+  // Divider,
   Link,
   Alert,
   CircularProgress,
@@ -27,12 +27,13 @@ import {
   Person as PersonIcon,
   Visibility,
   VisibilityOff,
-  Google as GoogleIcon,
+  // Google as GoogleIcon,
   AccountBalance as AccountBalanceIcon,
 } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
 
 const SignUp: React.FC = () => {
+
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -63,14 +64,13 @@ const SignUp: React.FC = () => {
       setError("Passwords do not match")
       return
     }
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long")
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long")
       return
     }
     setLoading(true)
     setError("")
     try {
-      console.log(formData)
       const response = await fetch("/api/user", {
         method: "POST",
         body: JSON.stringify(formData),
@@ -86,10 +86,10 @@ const SignUp: React.FC = () => {
     }
   }
 
-  const handleGoogleSignUp = () => {
-    // Google sign up logic
-    alert("Google Sign Up clicked")
-  }
+  // const handleGoogleSignUp = () => {
+  //   // Google sign up logic
+  //   alert("Google Sign Up clicked")
+  // }
 
   return (
     <Box
@@ -605,7 +605,7 @@ const SignUp: React.FC = () => {
                     {loading ? <CircularProgress size={24} color="inherit" /> : "Create Budget Account"}
                   </Button>
 
-                  <Divider
+                  {/* <Divider
                     sx={{
                       "&::before, &::after": {
                         borderColor: alpha(theme.palette.divider, 0.3),
@@ -624,9 +624,9 @@ const SignUp: React.FC = () => {
                     >
                       OR
                     </Typography>
-                  </Divider>
+                  </Divider> */}
 
-                  <Button
+                  {/* <Button
                     variant="outlined"
                     fullWidth
                     onClick={handleGoogleSignUp}
@@ -649,7 +649,7 @@ const SignUp: React.FC = () => {
                     }}
                   >
                     Continue with Google
-                  </Button>
+                  </Button> */}
                 </Stack>
               </Box>
 

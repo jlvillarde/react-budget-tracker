@@ -46,7 +46,7 @@ export default function WelcomePage() {
 
   return (
     <Box sx={{ width: "100%", maxWidth: "1200px" }}>
-      <Grid container spacing={6} alignItems="center" sx={{ minHeight: "70vh" }}>
+      <Grid container spacing={6} alignItems="center" sx={{ minHeight: "70vh" }} py={2}>
         {/* Left Column - Hero Content */}
         <Grid size={{ xs: 12, lg: 6 }}>
           <Stack spacing={4}>

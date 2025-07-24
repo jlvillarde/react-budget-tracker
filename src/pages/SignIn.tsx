@@ -9,7 +9,7 @@ import {
   Typography,
   InputAdornment,
   IconButton,
-  Divider,
+  // Divider,
   Link,
   Alert,
   CircularProgress,
@@ -24,7 +24,7 @@ import {
   Lock as LockIcon,
   Visibility,
   VisibilityOff,
-  Google as GoogleIcon,
+  // Google as GoogleIcon,
   AccountBalance as AccountBalanceIcon,
 } from "@mui/icons-material"
 import { useNavigate } from "react-router-dom"
@@ -45,9 +45,19 @@ const SignIn: React.FC = () => {
     setError("")
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      alert(`Sign In: ${email}`)
+      const response = await fetch('/api/login', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      })
+
+      if (response.ok) {
+        // In case your backend returns 200 with success JSON
+        navigate("/dashboard");
+      } else {
+        setError("Invalid email or password");
+      }
+
     } catch (err) {
       setError("Invalid email or password")
     } finally {
@@ -55,10 +65,10 @@ const SignIn: React.FC = () => {
     }
   }
 
-  const handleGoogleSignIn = () => {
-    // Google sign in logic
-    alert("Google Sign In clicked")
-  }
+  // const handleGoogleSignIn = () => {
+  //   // Google sign in logic
+  //   alert("Google Sign In clicked")
+  // }
 
   return (
     <Box
@@ -400,7 +410,7 @@ const SignIn: React.FC = () => {
                     {loading ? <CircularProgress size={24} color="inherit" /> : "Sign In"}
                   </Button>
 
-                  <Divider
+                  {/* <Divider
                     sx={{
                       "&::before, &::after": {
                         borderColor: alpha(theme.palette.divider, 0.3),
@@ -419,9 +429,9 @@ const SignIn: React.FC = () => {
                     >
                       OR
                     </Typography>
-                  </Divider>
+                  </Divider> */}
 
-                  <Button
+                  {/* <Button
                     variant="outlined"
                     fullWidth
                     onClick={handleGoogleSignIn}
@@ -442,9 +452,9 @@ const SignIn: React.FC = () => {
                       },
                       transition: "all 0.3s ease-in-out",
                     }}
-                  >
-                    Continue with Google
-                  </Button>
+                  > */}
+                  {/* Continue with Google */}
+                  {/* </Button> */}
                 </Stack>
               </Box>
 
@@ -484,7 +494,7 @@ const SignIn: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
-    </Box>
+    </Box >
   )
 }
 

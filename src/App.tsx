@@ -5,6 +5,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import { ThemeProvider } from './context/ThemeContext';
 import LandingPageLayout from './layouts/LandingPageLayout';
+import DashboardLayout from './layouts/DashboardLayout';
 import BudgetPlannerLanding from './pages/BudgetPlannerLanding';
 
 const routes: RouteObject[] = [
@@ -17,6 +18,10 @@ const routes: RouteObject[] = [
       { path: 'signup', element: <SignUp /> },
     ],
   },
+  {
+    path: '/dashboard',
+    element: <DashboardLayout />,
+  }
 ];
 
 const router = createBrowserRouter(routes);
