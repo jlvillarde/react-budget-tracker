@@ -27,9 +27,9 @@ import {
     Menu as MenuIcon,
     Dashboard as DashboardIcon,
     AccountBalance as AccountBalanceIcon,
-    Category as CategoryIcon,
+    // Category as CategoryIcon,
     Receipt as ReceiptIcon,
-    TrendingUp as TrendingUpIcon,
+    // TrendingUp as TrendingUpIcon,
     Settings as SettingsIcon,
     Notifications as NotificationsIcon,
     AccountCircle,
@@ -47,22 +47,12 @@ const navigationItems = [
     {
         text: "Dashboard",
         icon: <DashboardIcon />,
-        path: "/dashboard",
+        path: "/dashboard/reports",
     },
     {
         text: "Expenses",
         icon: <ReceiptIcon />,
         path: "/dashboard/expenses",
-    },
-    {
-        text: "Categories",
-        icon: <CategoryIcon />,
-        path: "/dashboard/categories",
-    },
-    {
-        text: "Analytics",
-        icon: <TrendingUpIcon />,
-        path: "/dashboard/analytics",
     },
     {
         text: "Settings",

@@ -10,6 +10,7 @@ import DashboardLayout from "./layouts/DashboardLayout"
 import BudgetPlannerLanding from "./pages/BudgetPlannerLanding"
 import Expenses from "./pages/Expenses"
 import Settings from "./pages/Settings"
+import Analytics from "./pages/Analytics"
 import ProtectedRoute from "./components/ProtectedRoute"
 
 const routes: RouteObject[] = [
@@ -30,6 +31,7 @@ const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
+      { index: true, path: "reports", element: <Analytics /> },
       { path: "expenses", element: <Expenses /> },
       { path: "settings", element: <Settings /> },
     ],

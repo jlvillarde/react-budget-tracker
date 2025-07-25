@@ -55,7 +55,7 @@ const SignIn: React.FC = () => {
       if (response.ok) {
         const userData = await response.json()
         login(userData) // Update user context
-        navigate("/dashboard/expenses")
+        navigate("/dashboard/reports")
       } else {
         const errorData = await response.json()
         setError(errorData.message || "Invalid email or password")

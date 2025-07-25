@@ -51,6 +51,7 @@ interface ExpenseDTO {
 
 const Expenses: React.FC = () => {
     const [expenses, setExpenses] = useState<ExpenseDTO[]>([])
+    const [categories, setCategories] = useState<string[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
     const [openDialog, setOpenDialog] = useState(false)
@@ -65,18 +66,24 @@ const Expenses: React.FC = () => {
 
     const theme = useTheme()
 
-    const categories = [
-        "Food & Dining",
-        "Transportation",
-        "Shopping",
-        "Entertainment",
-        "Bills & Utilities",
-        "Healthcare",
-        "Travel",
-        "Education",
-        "Personal Care",
-        "Other",
-    ]
+    // Fetch categories
+    const fetchCategories = async () => {
+        try {
+            setLoading(true)
+            const response = await fetch("/api/categories")
+            if (response.ok) {
+                const data = await response.json()
+                setCategories(data)
+            } else {
+                setError("Failed to fetch categories")
+            }
+        } catch (err) {
+            setError("Failed to fetch categories")
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
     // Fetch expenses
     const fetchExpenses = async () => {
@@ -218,6 +225,7 @@ const Expenses: React.FC = () => {
 
     useEffect(() => {
         fetchExpenses()
+        fetchCategories()
     }, [])
 
     if (loading) {
@@ -374,7 +382,7 @@ const Expenses: React.FC = () => {
                                 }}
                             />
                             <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
-                                ₱{expenses.length > 0 ? (totalExpenses / expenses.length).toFixed(2) : "₱0.00"}
+                                ₱{expenses.length > 0 ? (totalExpenses / expenses.length).toFixed(2) : "0.00"}
                             </Typography>
                             <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                                 Average per Transaction
@@ -536,6 +544,9 @@ const Expenses: React.FC = () => {
                                         {category}
                                     </MenuItem>
                                 ))}
+                                <MenuItem key="others" value="others">
+                                    Others
+                                </MenuItem>
                             </Select>
                         </FormControl>
 
