@@ -61,10 +61,12 @@ interface ExpenseDTO {
 
 const Analytics: React.FC = () => {
     // State
-    const [categories, setCategories] = useState<string[]>([])
+    // const [categories, setCategories] = useState<string[]>([])
+    const [, setCategories] = useState<string[]>([])
     const [expenses, setExpenses] = useState<ExpenseDTO[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    // const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [timeFrame, setTimeFrame] = useState("month");
     const [activeTab, setActiveTab] = useState(0);
 
@@ -84,38 +86,38 @@ const Analytics: React.FC = () => {
     ];
 
     // Generate mock data for demonstration when API fails
-    const generateMockData = () => {
-        const mockData: ExpenseDTO[] = [];
-        const now = new Date();
-        const categories = [
-            "Food & Dining",
-            "Transportation",
-            "Shopping",
-            "Entertainment",
-            "Bills & Utilities",
-            "Healthcare",
-            "Travel",
-            "Education",
-            "Personal Care",
-            "Other",
-        ];
+    // const generateMockData = () => {
+    //     const mockData: ExpenseDTO[] = [];
+    //     const now = new Date();
+    //     const categories = [
+    //         "Food & Dining",
+    //         "Transportation",
+    //         "Shopping",
+    //         "Entertainment",
+    //         "Bills & Utilities",
+    //         "Healthcare",
+    //         "Travel",
+    //         "Education",
+    //         "Personal Care",
+    //         "Other",
+    //     ];
 
-        for (let i = 0; i < 50; i++) {
-            const randomDaysAgo = Math.floor(Math.random() * 180); // Past 6 months
-            const date = new Date(now);
-            date.setDate(now.getDate() - randomDaysAgo);
+    //     for (let i = 0; i < 50; i++) {
+    //         const randomDaysAgo = Math.floor(Math.random() * 180); // Past 6 months
+    //         const date = new Date(now);
+    //         date.setDate(now.getDate() - randomDaysAgo);
 
-            mockData.push({
-                id: i + 1,
-                amount: Math.floor(Math.random() * 5000) + 100, // Between 100 and 5100
-                description: `Expense ${i + 1}`,
-                category: categories[Math.floor(Math.random() * categories.length)],
-                date: date.toISOString().split('T')[0],
-            });
-        }
+    //         mockData.push({
+    //             id: i + 1,
+    //             amount: Math.floor(Math.random() * 5000) + 100, // Between 100 and 5100
+    //             description: `Expense ${i + 1}`,
+    //             category: categories[Math.floor(Math.random() * categories.length)],
+    //             date: date.toISOString().split('T')[0],
+    //         });
+    //     }
 
-        return mockData;
-    };
+    //     return mockData;
+    // };
 
     // Fetch categories
     const fetchCategories = async () => {
@@ -358,7 +360,8 @@ const Analytics: React.FC = () => {
                 width: "100%",
                 maxWidth: "1200px",
                 mx: "auto",
-                p: { xs: 2, md: 4 },
+                px: { xs: 4 },
+                pt: { xs: 2 },
             }}
         >
             {/* Header */}
@@ -553,6 +556,7 @@ const Analytics: React.FC = () => {
                     <Tab icon={<PieChartIcon sx={{ mr: 1 }} />} iconPosition="start" label="Category Breakdown" />
                     <Tab icon={<BarChartIcon sx={{ mr: 1 }} />} iconPosition="start" label="Monthly Trends" />
                     <Tab icon={<LineChartIcon sx={{ mr: 1 }} />} iconPosition="start" label="Daily Spending" />
+                    <Tab icon={<CalendarIcon sx={{ mr: 1 }} />} iconPosition="start" label="Day of Week Analysis" />
                 </Tabs>
             </Box>
 
@@ -599,7 +603,7 @@ const Analytics: React.FC = () => {
                                                             : ''
                                                     }
                                                 >
-                                                    {expensesByCategory.map((entry, index) => (
+                                                    {expensesByCategory.map((_entry, index) => (
                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                     ))}
                                                 </Pie>
@@ -801,6 +805,135 @@ const Analytics: React.FC = () => {
                         )}
                     </Card>
                 )}
+
+                {activeTab === 3 && (
+                    <Card
+                        elevation={0}
+                        sx={{
+                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                            backdropFilter: "blur(10px)",
+                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                            p: 2
+                        }}
+                    >
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                                Spending by Day of Week
+                            </Typography>
+                            <Tooltip title="Shows your spending patterns by day of the week">
+                                <IconButton size="small">
+                                    <InfoIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+
+                        {spendingByDayOfWeek.some(day => day.total > 0) ? (
+                            <Grid container spacing={3}>
+                                <Grid size={{ xs: 12, md: 8 }}>
+                                    <Box sx={{ height: 400 }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart
+                                                data={spendingByDayOfWeek}
+                                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
+                                                <XAxis
+                                                    dataKey="name"
+                                                    tick={{ fill: theme.palette.text.secondary }}
+                                                />
+                                                <YAxis
+                                                    tickFormatter={(value) => `₱${value}`}
+                                                    tick={{ fill: theme.palette.text.secondary }}
+                                                />
+                                                <RechartsTooltip
+                                                    formatter={(value: number) => `₱${value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                                    contentStyle={{
+                                                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                                                        border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                                                        borderRadius: 8,
+                                                    }}
+                                                />
+                                                <Legend />
+                                                <Bar
+                                                    dataKey="total"
+                                                    name="Total Spent"
+                                                    fill={theme.palette.warning.main}
+                                                    radius={[4, 4, 0, 0]}
+                                                />
+                                                <Bar
+                                                    dataKey="average"
+                                                    name="Average per Transaction"
+                                                    fill={theme.palette.info.main}
+                                                    radius={[4, 4, 0, 0]}
+                                                />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </Box>
+                                </Grid>
+                                <Grid size={{ xs: 12, md: 4 }}>
+                                    <Paper
+                                        elevation={0}
+                                        sx={{
+                                            p: 2,
+                                            backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                                            height: '100%'
+                                        }}
+                                    >
+                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                            Day of Week Insights
+                                        </Typography>
+
+                                        {highestSpendingDay.name && (
+                                            <Box sx={{ mb: 3 }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                        Highest Spending Day:
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                                                        {highestSpendingDay.name}
+                                                    </Typography>
+                                                </Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                        Total Amount:
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                        ₱{highestSpendingDay.total.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    </Typography>
+                                                </Box>
+
+                                                <Divider sx={{ my: 2 }} />
+
+                                                <Typography variant="body2" sx={{ mb: 2, color: theme.palette.text.secondary }}>
+                                                    Transaction Count by Day
+                                                </Typography>
+
+                                                {spendingByDayOfWeek.map((day, index) => (
+                                                    day.count > 0 ? (
+                                                        <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                            <Typography variant="body2">
+                                                                {day.name}:
+                                                            </Typography>
+                                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                                {day.count} transactions
+                                                            </Typography>
+                                                        </Box>
+                                                    ) : null
+                                                ))}
+                                            </Box>
+                                        )}
+                                    </Paper>
+                                </Grid>
+                            </Grid>
+                        ) : (
+                            <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                                    No expense data available for day-of-week analysis
+                                </Typography>
+                            </Box>
+                        )}
+                    </Card>
+                )}
             </Box>
 
             {/* Bottom Grid - Insights & Recommendations */}
@@ -850,8 +983,204 @@ const Analytics: React.FC = () => {
                                         />
                                     </Box>
                                 )}
+
+                                {highestSpendingDay.name && (
+                                    <Box>
+                                        <Typography variant="body1" sx={{ fontWeight: 500, mb: 1 }}>
+                                            Highest Spending Day
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            <Box
+                                                sx={{
+                                                    width: 12,
+                                                    height: 12,
+                                                    borderRadius: '50%',
+                                                    bgcolor: COLORS[1],
+                                                    mr: 1
+                                                }}
+                                            />
+                                            <Typography variant="body2">
+                                                {highestSpendingDay.name}: ₱{highestSpendingDay.total.toFixed(2)}
+                                            </Typography>
+                                        </Box>
+                                        <Chip
+                                            size="small"
+                                            label={`${highestSpendingDay.name}`}
+                                            sx={{ bgcolor: COLORS[1], color: '#fff' }}
+                                        />
+                                    </Box>
+                                )}
                             </Stack>
                         </CardContent>
+                    </Card>
+                </Grid>
+
+                {/* Month-over-Month Analysis Card */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                            backdropFilter: "blur(10px)",
+                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                            height: '100%'
+                        }}
+                    >
+                        <CardContent>
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 3, display: 'flex', alignItems: 'center' }}>
+                                <LightbulbIcon sx={{ mr: 1, color: theme.palette.warning.main }} />
+                                Month-over-Month Analysis
+                            </Typography>
+
+                            {monthlyExpenseData.length >= 2 ? (
+                                <Box>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexDirection: 'column',
+                                        mb: 3,
+                                        p: 2,
+                                        borderRadius: 2,
+                                        bgcolor: alpha(
+                                            monthOverMonthChange.isIncrease ?
+                                                theme.palette.error.main :
+                                                theme.palette.success.main,
+                                            0.1
+                                        ),
+                                    }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                            {monthOverMonthChange.isIncrease ? (
+                                                <TrendingUpIcon sx={{
+                                                    fontSize: 40,
+                                                    color: theme.palette.error.main,
+                                                    mr: 1
+                                                }} />
+                                            ) : (
+                                                <TrendingDownIcon sx={{
+                                                    fontSize: 40,
+                                                    color: theme.palette.success.main,
+                                                    mr: 1
+                                                }} />
+                                            )}
+                                            <Typography variant="h4" sx={{
+                                                fontWeight: 700,
+                                                color: monthOverMonthChange.isIncrease ?
+                                                    theme.palette.error.main :
+                                                    theme.palette.success.main
+                                            }}>
+                                                {(monthOverMonthChange.percentage ?? 0).toFixed(1)}%
+                                            </Typography>
+                                        </Box>
+                                        <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                                            {monthOverMonthChange.isIncrease ?
+                                                "Spending increased by " :
+                                                "Spending decreased by "}
+                                            ₱{monthOverMonthChange.value.toLocaleString('en-PH',
+                                                { minimumFractionDigits: 2, maximumFractionDigits: 2 })} compared to last month
+                                        </Typography>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                                            Current Month:
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            ₱{monthlyExpenseData[monthlyExpenseData.length - 1].amount.toLocaleString('en-PH',
+                                                { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                                            Previous Month:
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                            ₱{monthlyExpenseData[monthlyExpenseData.length - 2].amount.toLocaleString('en-PH',
+                                                { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            ) : (
+                                <Box sx={{ textAlign: 'center', py: 4 }}>
+                                    <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+                                        Not enough data for month-over-month comparison
+                                    </Typography>
+                                </Box>
+                            )}
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                {/* Day of Week Analysis Card */}
+                <Grid size={{ xs: 12, md: 12 }}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                            backdropFilter: "blur(10px)",
+                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                            p: 2,
+                            mt: 2
+                        }}
+                    >
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                                Spending by Day of Week
+                            </Typography>
+                            <Tooltip title="Shows your spending patterns by day of the week">
+                                <IconButton size="small">
+                                    <InfoIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+
+                        {spendingByDayOfWeek.some(day => day.total > 0) ? (
+                            <Box sx={{ height: 300, mt: 2 }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        data={spendingByDayOfWeek}
+                                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
+                                        <XAxis
+                                            dataKey="name"
+                                            tick={{ fill: theme.palette.text.secondary }}
+                                        />
+                                        <YAxis
+                                            tickFormatter={(value) => `₱${value}`}
+                                            tick={{ fill: theme.palette.text.secondary }}
+                                        />
+                                        <RechartsTooltip
+                                            formatter={(value: number) => `₱${value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                                            contentStyle={{
+                                                backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                                                border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
+                                                borderRadius: 8,
+                                            }}
+                                        />
+                                        <Legend />
+                                        <Bar
+                                            dataKey="total"
+                                            name="Total Spent"
+                                            fill={theme.palette.warning.main}
+                                            radius={[4, 4, 0, 0]}
+                                        />
+                                        <Bar
+                                            dataKey="average"
+                                            name="Average per Transaction"
+                                            fill={theme.palette.info.main}
+                                            radius={[4, 4, 0, 0]}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </Box>
+                        ) : (
+                            <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                                    No expense data available for day-of-week analysis
+                                </Typography>
+                            </Box>
+                        )}
                     </Card>
                 </Grid>
             </Grid>

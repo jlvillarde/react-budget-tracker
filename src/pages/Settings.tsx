@@ -9,18 +9,18 @@ import {
     CardContent,
     TextField,
     Button,
-    Switch,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
+    // Switch,
+    // FormControl,
+    // InputLabel,
+    // Select,
+    // MenuItem,
     Alert,
     CircularProgress,
     Stack,
     useTheme,
     alpha,
-    Grid,
-    FormControlLabel,
+    // Grid,
+    // FormControlLabel,
     IconButton,
     Dialog,
     DialogTitle,
@@ -37,20 +37,12 @@ import {
     Delete as DeleteIcon,
     Edit as EditIcon,
     Palette as PaletteIcon,
-    AttachMoney as AttachMoneyIcon,
+    // AttachMoney as AttachMoneyIcon,
     Category as CategoryIcon,
-    Notifications as NotificationsIcon,
 } from "@mui/icons-material"
 
 interface UserSettings {
     currency: string
-    language: string
-    theme: string
-    notifications: {
-        email: boolean
-        push: boolean
-        budgetAlerts: boolean
-    }
     budgetLimits: {
         daily: number
         weekly: number
@@ -62,30 +54,12 @@ interface UserSettings {
 const Settings: React.FC = () => {
     const [settings, setSettings] = useState<UserSettings>({
         currency: "PHP",
-        language: "en",
-        theme: "system",
-        notifications: {
-            email: true,
-            push: true,
-            budgetAlerts: true,
-        },
         budgetLimits: {
-            daily: 1000,
-            weekly: 5000,
-            monthly: 20000,
+            daily: 0,
+            weekly: 0,
+            monthly: 0
         },
-        categories: [
-            "Food & Dining",
-            "Transportation",
-            "Shopping",
-            "Entertainment",
-            "Bills & Utilities",
-            "Healthcare",
-            "Travel",
-            "Education",
-            "Personal Care",
-            "Other",
-        ],
+        categories: [],
     })
 
     const [loading, setLoading] = useState(false)
@@ -107,37 +81,47 @@ const Settings: React.FC = () => {
         { code: "MYR", name: "Malaysian Ringgit (RM)", symbol: "RM" },
     ]
 
-    const languages = [
-        { code: "en", name: "English" },
-        { code: "fil", name: "Filipino" },
-        { code: "es", name: "Spanish" },
-        { code: "fr", name: "French" },
-        { code: "de", name: "German" },
-        { code: "ja", name: "Japanese" },
-        { code: "ko", name: "Korean" },
-    ]
-
-    const themes = [
-        { value: "light", name: "Light" },
-        { value: "dark", name: "Dark" },
-        { value: "system", name: "System" },
-    ]
+    // No language or theme options needed
 
     // Load settings
     const loadSettings = async () => {
         try {
             setLoading(true)
-            const response = await fetch("/api/user/settings")
+            const response = await fetch("/api/settings")
             if (response.ok) {
                 const data = await response.json()
-                setSettings({ ...settings, ...data })
+                setSettings(prevSettings => ({
+                    ...prevSettings,
+                    ...data
+                }))
             }
         } catch (err) {
             console.error("Failed to load settings:", err)
+            setError("Failed to load settings")
         } finally {
             setLoading(false)
         }
     }
+
+    const loadCategories = async () => {
+        try {
+            setLoading(true)
+            const response = await fetch("/api/categories")
+            if (response.ok) {
+                const categories = await response.json()
+                setSettings(prevSettings => ({
+                    ...prevSettings,
+                    categories: [...categories]
+                }))
+            }
+        } catch (err) {
+            console.error("Failed to load categories:", err)
+            setError("Failed to load categories")
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
     // Save settings
     const handleSaveSettings = async () => {
@@ -146,7 +130,7 @@ const Settings: React.FC = () => {
             setError("")
             setSuccess("")
 
-            const response = await fetch("/api/user/settings", {
+            const response = await fetch("/api/settings", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -167,17 +151,44 @@ const Settings: React.FC = () => {
         }
     }
 
+
     // Category management
-    const handleAddCategory = () => {
-        if (newCategory.trim() && !settings.categories.includes(newCategory.trim())) {
-            setSettings({
-                ...settings,
-                categories: [...settings.categories, newCategory.trim()],
+    const handleAddCategory = async () => {
+        const trimmedCategory = newCategory.trim()
+        // if (!trimmedCategory || settings.categories.includes(trimmedCategory)) return
+
+        try {
+            // Send PUT request to update categories on the server
+            // const updatedCategories = [...settings.categories, trimmedCategory]
+
+            const response = await fetch("/api/categories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name: trimmedCategory }),
             })
+
+            if (response.ok) {
+                const updatedCategories = await response.json()
+                console.log(updatedCategories);
+                setSettings(prev => ({
+                    ...prev,
+                    categories: updatedCategories,
+                }))
+                setSuccess("Category added successfully!")
+            } else {
+                setError("Failed to update categories.")
+            }
+        } catch (err) {
+            console.error(err)
+            setError("An error occurred while adding the category.")
+        } finally {
             setNewCategory("")
             setOpenCategoryDialog(false)
         }
     }
+
 
     const handleEditCategory = (index: number) => {
         setEditingCategory({ index, name: settings.categories[index] })
@@ -185,29 +196,80 @@ const Settings: React.FC = () => {
         setOpenCategoryDialog(true)
     }
 
-    const handleUpdateCategory = () => {
+    const handleUpdateCategory = async () => {
         if (editingCategory && newCategory.trim()) {
-            const updatedCategories = [...settings.categories]
-            updatedCategories[editingCategory.index] = newCategory.trim()
-            setSettings({
-                ...settings,
-                categories: updatedCategories,
-            })
-            setEditingCategory(null)
-            setNewCategory("")
-            setOpenCategoryDialog(false)
+            const oldName = settings.categories[editingCategory.index]
+            const newName = newCategory.trim()
+
+            try {
+                const response = await fetch("/api/categories", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        old_name: oldName,
+                        new_name: newName
+                    }),
+                })
+
+                if (response.ok) {
+                    const updatedCategories = [...settings.categories]
+                    updatedCategories[editingCategory.index] = newName
+                    setSettings(prevSettings => ({
+                        ...prevSettings,
+                        categories: updatedCategories,
+                    }))
+                    setSuccess("Category updated successfully!")
+                } else {
+                    const error = await response.json()
+                    setError(error.detail || "Failed to update category.")
+                }
+            } catch (err) {
+                console.error(err)
+                setError("An error occurred while updating the category.")
+            } finally {
+                setEditingCategory(null)
+                setNewCategory("")
+                setOpenCategoryDialog(false)
+            }
         }
     }
 
-    const handleDeleteCategory = (index: number) => {
-        if (window.confirm("Are you sure you want to delete this category?")) {
-            const updatedCategories = settings.categories.filter((_, i) => i !== index)
-            setSettings({
-                ...settings,
-                categories: updatedCategories,
+
+    const handleDeleteCategory = async (index: number) => {
+        const categoryToDelete = settings.categories[index]
+
+        if (!categoryToDelete) return
+
+        const confirmDelete = window.confirm(`Are you sure you want to delete "${categoryToDelete}"?`)
+        if (!confirmDelete) return
+
+        try {
+            const response = await fetch("/api/categories", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name: categoryToDelete }),
             })
+
+            if (response.ok) {
+                const updatedCategories = settings.categories.filter((_, i) => i !== index)
+                setSettings(prevSettings => ({
+                    ...prevSettings,
+                    categories: updatedCategories,
+                }))
+            } else {
+                const error = await response.json()
+                setError(error.detail || "Failed to delete category.")
+            }
+        } catch (err) {
+            console.error(err)
+            setError("An error occurred while deleting the category.")
         }
     }
+
 
     const handleCloseCategoryDialog = () => {
         setOpenCategoryDialog(false)
@@ -215,28 +277,33 @@ const Settings: React.FC = () => {
         setNewCategory("")
     }
 
-    useEffect(() => {
-        loadSettings()
-    }, [])
-
     const getCurrencySymbol = (currencyCode: string) => {
         const currency = currencies.find((c) => c.code === currencyCode)
         return currency?.symbol || currencyCode
     }
 
+    useEffect(() => {
+        loadSettings()
+        loadCategories()
+    }, [])
+
+
     return (
         <Box
             sx={{
                 width: "100%",
-                maxWidth: "1000px",
+                maxWidth: "1100px",
                 mx: "auto",
                 p: { xs: 2, md: 4 },
+                bgcolor: alpha(theme.palette.background.paper, 0.5),
+                borderRadius: 2,
+                boxShadow: 3,
             }}
         >
             {/* Header */}
             <Box sx={{ mb: 4, textAlign: "center" }}>
                 <Typography
-                    variant="h3"
+                    variant="h4"
                     sx={{
                         fontWeight: 700,
                         mb: 2,
@@ -249,10 +316,10 @@ const Settings: React.FC = () => {
                     Settings
                 </Typography>
                 <Typography
-                    variant="h6"
+                    variant="subtitle1"
                     sx={{
                         color: theme.palette.text.secondary,
-                        mb: 3,
+                        mb: 1,
                     }}
                 >
                     Customize your budget tracker experience
@@ -260,305 +327,255 @@ const Settings: React.FC = () => {
             </Box>
 
             {/* Alerts */}
-            {error && (
-                <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError("")}>
-                    {error}
-                </Alert>
-            )}
+            <Stack spacing={2} sx={{ mb: 3 }}>
+                {error && (
+                    <Alert severity="error" onClose={() => setError("")}>
+                        {error}
+                    </Alert>
+                )}
 
-            {success && (
-                <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess("")}>
-                    {success}
-                </Alert>
-            )}
+                {success && (
+                    <Alert severity="success" onClose={() => setSuccess("")}>
+                        {success}
+                    </Alert>
+                )}
+            </Stack>
 
-            <Grid container spacing={4}>
-                {/* General Settings */}
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                            backdropFilter: "blur(10px)",
-                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            mb: 3,
-                        }}
-                    >
-                        <CardContent>
-                            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                                <AttachMoneyIcon sx={{ mr: 2, color: theme.palette.success.main }} />
-                                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                                    General Settings
-                                </Typography>
-                            </Box>
-
-                            <Stack spacing={3}>
-                                <FormControl fullWidth>
-                                    <InputLabel>Currency</InputLabel>
-                                    <Select
-                                        value={settings.currency}
-                                        onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
-                                        label="Currency"
-                                    >
-                                        {currencies.map((currency) => (
-                                            <MenuItem key={currency.code} value={currency.code}>
-                                                {currency.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                <FormControl fullWidth>
-                                    <InputLabel>Language</InputLabel>
-                                    <Select
-                                        value={settings.language}
-                                        onChange={(e) => setSettings({ ...settings, language: e.target.value })}
-                                        label="Language"
-                                    >
-                                        {languages.map((language) => (
-                                            <MenuItem key={language.code} value={language.code}>
-                                                {language.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                <FormControl fullWidth>
-                                    <InputLabel>Theme</InputLabel>
-                                    <Select
-                                        value={settings.theme}
-                                        onChange={(e) => setSettings({ ...settings, theme: e.target.value })}
-                                        label="Theme"
-                                    >
-                                        {themes.map((themeOption) => (
-                                            <MenuItem key={themeOption.value} value={themeOption.value}>
-                                                {themeOption.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Stack>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            <Stack
+                spacing={4}
+                sx={{
+                    maxHeight: "100vh",
+                    height: "fit-content",
+                    // justifyContent: "center", // vertical centering
+                    alignItems: "center",
+                    mb: 4    // horizontal centering
+                }} >
 
                 {/* Budget Limits */}
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                            backdropFilter: "blur(10px)",
-                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            mb: 3,
-                        }}
-                    >
-                        <CardContent>
-                            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                                <PaletteIcon sx={{ mr: 2, color: theme.palette.warning.main }} />
-                                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                                    Budget Limits
-                                </Typography>
+                <Card
+                    elevation={1}
+                    sx={{
+                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                        backdropFilter: "blur(10px)",
+                        borderRadius: 2,
+                        border: `1px solid ${alpha(theme.palette.warning.main, 0.1)}`,
+                        width: "100%",
+                        maxWidth: "800px",
+                        mx: "auto"
+                    }}
+                >
+                    <CardContent>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+                            <Box sx={{
+                                backgroundColor: alpha(theme.palette.warning.light, 0.2),
+                                p: 1,
+                                borderRadius: 1,
+                                display: "flex",
+                                mr: 2
+                            }}>
+                                <PaletteIcon sx={{ color: theme.palette.warning.main }} />
                             </Box>
+                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                                Budget Limits
+                            </Typography>
+                        </Box>
 
-                            <Stack spacing={3}>
-                                <TextField
-                                    label={`Daily Limit (${getCurrencySymbol(settings.currency)})`}
-                                    type="number"
-                                    fullWidth
-                                    value={settings.budgetLimits.daily}
-                                    onChange={(e) =>
-                                        setSettings({
-                                            ...settings,
-                                            budgetLimits: {
-                                                ...settings.budgetLimits,
-                                                daily: Number.parseFloat(e.target.value) || 0,
-                                            },
-                                        })
-                                    }
-                                    inputProps={{ min: 0, step: 0.01 }}
-                                />
+                        <Stack spacing={3}>
+                            <TextField
+                                label={`Daily Limit (${getCurrencySymbol(settings.currency)})`}
+                                type="number"
+                                fullWidth
+                                variant="outlined"
+                                value={settings.budgetLimits.daily}
+                                onChange={(e) =>
+                                    setSettings({
+                                        ...settings,
+                                        budgetLimits: {
+                                            ...settings.budgetLimits,
+                                            daily: Number.parseFloat(e.target.value) || 0,
+                                        },
+                                    })
+                                }
+                                InputProps={{
+                                    startAdornment: (
+                                        <Box component="span" sx={{ mr: 1, color: theme.palette.text.secondary }}>
+                                            {getCurrencySymbol(settings.currency)}
+                                        </Box>
+                                    ),
+                                }}
+                                inputProps={{ min: 0, step: 0.01 }}
+                            />
 
-                                <TextField
-                                    label={`Weekly Limit (${getCurrencySymbol(settings.currency)})`}
-                                    type="number"
-                                    fullWidth
-                                    value={settings.budgetLimits.weekly}
-                                    onChange={(e) =>
-                                        setSettings({
-                                            ...settings,
-                                            budgetLimits: {
-                                                ...settings.budgetLimits,
-                                                weekly: Number.parseFloat(e.target.value) || 0,
-                                            },
-                                        })
-                                    }
-                                    inputProps={{ min: 0, step: 0.01 }}
-                                />
+                            <TextField
+                                label={`Weekly Limit (${getCurrencySymbol(settings.currency)})`}
+                                type="number"
+                                fullWidth
+                                variant="outlined"
+                                value={settings.budgetLimits.weekly}
+                                onChange={(e) =>
+                                    setSettings({
+                                        ...settings,
+                                        budgetLimits: {
+                                            ...settings.budgetLimits,
+                                            weekly: Number.parseFloat(e.target.value) || 0,
+                                        },
+                                    })
+                                }
+                                InputProps={{
+                                    startAdornment: (
+                                        <Box component="span" sx={{ mr: 1, color: theme.palette.text.secondary }}>
+                                            {getCurrencySymbol(settings.currency)}
+                                        </Box>
+                                    ),
+                                }}
+                                inputProps={{ min: 0, step: 0.01 }}
+                            />
 
-                                <TextField
-                                    label={`Monthly Limit (${getCurrencySymbol(settings.currency)})`}
-                                    type="number"
-                                    fullWidth
-                                    value={settings.budgetLimits.monthly}
-                                    onChange={(e) =>
-                                        setSettings({
-                                            ...settings,
-                                            budgetLimits: {
-                                                ...settings.budgetLimits,
-                                                monthly: Number.parseFloat(e.target.value) || 0,
-                                            },
-                                        })
-                                    }
-                                    inputProps={{ min: 0, step: 0.01 }}
-                                />
-                            </Stack>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                {/* Notifications */}
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                            backdropFilter: "blur(10px)",
-                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            mb: 3,
-                        }}
-                    >
-                        <CardContent>
-                            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                                <NotificationsIcon sx={{ mr: 2, color: theme.palette.info.main }} />
-                                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                                    Notifications
-                                </Typography>
-                            </Box>
-
-                            <Stack spacing={2}>
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={settings.notifications.email}
-                                            onChange={(e) =>
-                                                setSettings({
-                                                    ...settings,
-                                                    notifications: {
-                                                        ...settings.notifications,
-                                                        email: e.target.checked,
-                                                    },
-                                                })
-                                            }
-                                            color="primary"
-                                        />
-                                    }
-                                    label="Email Notifications"
-                                />
-
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={settings.notifications.push}
-                                            onChange={(e) =>
-                                                setSettings({
-                                                    ...settings,
-                                                    notifications: {
-                                                        ...settings.notifications,
-                                                        push: e.target.checked,
-                                                    },
-                                                })
-                                            }
-                                            color="primary"
-                                        />
-                                    }
-                                    label="Push Notifications"
-                                />
-
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={settings.notifications.budgetAlerts}
-                                            onChange={(e) =>
-                                                setSettings({
-                                                    ...settings,
-                                                    notifications: {
-                                                        ...settings.notifications,
-                                                        budgetAlerts: e.target.checked,
-                                                    },
-                                                })
-                                            }
-                                            color="primary"
-                                        />
-                                    }
-                                    label="Budget Limit Alerts"
-                                />
-                            </Stack>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                            <TextField
+                                label={`Monthly Limit (${getCurrencySymbol(settings.currency)})`}
+                                type="number"
+                                fullWidth
+                                variant="outlined"
+                                value={settings.budgetLimits.monthly}
+                                onChange={(e) =>
+                                    setSettings({
+                                        ...settings,
+                                        budgetLimits: {
+                                            ...settings.budgetLimits,
+                                            monthly: Number.parseFloat(e.target.value) || 0,
+                                        },
+                                    })
+                                }
+                                InputProps={{
+                                    startAdornment: (
+                                        <Box component="span" sx={{ mr: 1, color: theme.palette.text.secondary }}>
+                                            {getCurrencySymbol(settings.currency)}
+                                        </Box>
+                                    ),
+                                }}
+                                inputProps={{ min: 0, step: 0.01 }}
+                            />
+                        </Stack>
+                    </CardContent>
+                </Card>
 
                 {/* Categories Management */}
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                            backdropFilter: "blur(10px)",
-                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            mb: 3,
-                        }}
-                    >
-                        <CardContent>
-                            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
-                                <Box sx={{ display: "flex", alignItems: "center" }}>
-                                    <CategoryIcon sx={{ mr: 2, color: theme.palette.secondary.main }} />
-                                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                                        Categories
-                                    </Typography>
+                <Card
+                    elevation={1}
+                    sx={{
+                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                        backdropFilter: "blur(10px)",
+                        borderRadius: 2,
+                        border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
+                        width: "100%",
+                        maxWidth: "800px",
+                        mx: "auto"
+                    }}
+                >
+                    <CardContent>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 3 }}>
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                                <Box sx={{
+                                    backgroundColor: alpha(theme.palette.secondary.light, 0.2),
+                                    p: 1,
+                                    borderRadius: 1,
+                                    display: "flex",
+                                    mr: 2
+                                }}>
+                                    <CategoryIcon sx={{ color: theme.palette.secondary.main }} />
                                 </Box>
-                                <Button
-                                    variant="outlined"
-                                    size="small"
-                                    startIcon={<AddIcon />}
-                                    onClick={() => setOpenCategoryDialog(true)}
-                                >
-                                    Add
-                                </Button>
+                                <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                                    Categories
+                                </Typography>
                             </Box>
+                            <Button
+                                variant="contained"
+                                size="small"
+                                color="secondary"
+                                startIcon={<AddIcon />}
+                                onClick={() => setOpenCategoryDialog(true)}
+                                sx={{ borderRadius: 1.5 }}
+                            >
+                                Add
+                            </Button>
+                        </Box>
 
-                            <Box sx={{ maxHeight: 300, overflowY: "auto" }}>
-                                <List dense>
-                                    {settings.categories.map((category, index) => (
-                                        <ListItem
-                                            key={index}
-                                            sx={{
-                                                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                                                borderRadius: 1,
-                                                mb: 1,
-                                                backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                                            }}
-                                        >
-                                            <ListItemText primary={category} />
-                                            <ListItemSecondaryAction>
-                                                <IconButton size="small" onClick={() => handleEditCategory(index)} sx={{ mr: 1 }}>
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
-                                                <IconButton size="small" onClick={() => handleDeleteCategory(index)} color="error">
-                                                    <DeleteIcon fontSize="small" />
-                                                </IconButton>
-                                            </ListItemSecondaryAction>
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
+                        <Box sx={{
+                            maxHeight: 300,
+                            overflowY: "auto",
+                            borderRadius: 1,
+                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                            p: 1,
+                            '&::-webkit-scrollbar': {
+                                width: '8px',
+                            },
+                            '&::-webkit-scrollbar-track': {
+                                backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                                borderRadius: '4px',
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                                backgroundColor: theme.palette.success.main,
+                                borderRadius: '4px',
+                                border: `2px solid ${alpha(theme.palette.background.paper, 0.5)}`,
+                                '&:hover': {
+                                    backgroundColor: theme.palette.success.dark,
+                                }
+                            },
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: `${theme.palette.success.main} ${alpha(theme.palette.background.paper, 0.5)}`
+                        }}>
+                            <List dense>
+                                {settings.categories.map((category, index) => (
+                                    <ListItem
+                                        key={index}
+                                        sx={{
+                                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                            borderRadius: 1.5,
+                                            mb: 1,
+                                            backgroundColor: alpha(theme.palette.background.paper, 0.7),
+                                        }}
+                                    >
+                                        <ListItemText
+                                            primary={category}
+                                            primaryTypographyProps={{ fontWeight: 500 }}
+                                        />
+                                        <ListItemSecondaryAction>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleEditCategory(index)}
+                                                sx={{
+                                                    mr: 1,
+                                                    backgroundColor: alpha(theme.palette.primary.light, 0.1),
+                                                    '&:hover': {
+                                                        backgroundColor: alpha(theme.palette.primary.light, 0.2),
+                                                    }
+                                                }}
+                                            >
+                                                <EditIcon fontSize="small" color="primary" />
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleDeleteCategory(index)}
+                                                sx={{
+                                                    backgroundColor: alpha(theme.palette.error.light, 0.1),
+                                                    '&:hover': {
+                                                        backgroundColor: alpha(theme.palette.error.light, 0.2),
+                                                    }
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" color="error" />
+                                            </IconButton>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </Box>
+                    </CardContent>
+                </Card>
+            </Stack>
 
             {/* Save Button */}
-            <Box sx={{ textAlign: "center", mt: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
                 <Button
                     variant="contained"
                     size="large"
@@ -570,10 +587,12 @@ const Settings: React.FC = () => {
                         "&:hover": {
                             backgroundColor: theme.palette.success.dark,
                         },
-                        px: 4,
+                        px: 6,
                         py: 1.5,
-                        fontSize: "1.1rem",
+                        borderRadius: 2,
+                        fontSize: "1rem",
                         fontWeight: 600,
+                        boxShadow: 2,
                     }}
                 >
                     {loading ? "Saving..." : "Save Settings"}
@@ -588,13 +607,25 @@ const Settings: React.FC = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                        backgroundColor: alpha(theme.palette.background.paper, 0.95),
                         backdropFilter: "blur(20px)",
+                        borderRadius: 2,
+                        boxShadow: 24,
                     },
                 }}
             >
-                <DialogTitle>{editingCategory ? "Edit Category" : "Add New Category"}</DialogTitle>
-                <DialogContent>
+                <DialogTitle sx={{
+                    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    pb: 2
+                }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <CategoryIcon sx={{ mr: 1, color: theme.palette.secondary.main }} />
+                        <Typography variant="h6">
+                            {editingCategory ? "Edit Category" : "Add New Category"}
+                        </Typography>
+                    </Box>
+                </DialogTitle>
+                <DialogContent sx={{ pt: 3 }}>
                     <TextField
                         autoFocus
                         margin="dense"
@@ -603,26 +634,37 @@ const Settings: React.FC = () => {
                         variant="outlined"
                         value={newCategory}
                         onChange={(e) => setNewCategory(e.target.value)}
-                        sx={{ mt: 2 }}
+                        InputProps={{
+                            sx: { borderRadius: 1.5 }
+                        }}
                     />
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseCategoryDialog}>Cancel</Button>
+                <DialogActions sx={{ px: 3, pb: 3 }}>
+                    <Button
+                        onClick={handleCloseCategoryDialog}
+                        variant="outlined"
+                        sx={{ borderRadius: 1.5 }}
+                    >
+                        Cancel
+                    </Button>
                     <Button
                         onClick={editingCategory ? handleUpdateCategory : handleAddCategory}
                         variant="contained"
                         sx={{
-                            backgroundColor: theme.palette.success.main,
+                            backgroundColor: theme.palette.secondary.main,
                             "&:hover": {
-                                backgroundColor: theme.palette.success.dark,
+                                backgroundColor: theme.palette.secondary.dark,
                             },
+                            borderRadius: 1.5,
+                            ml: 2
                         }}
+                        disabled={!newCategory.trim()}
                     >
                         {editingCategory ? "Update" : "Add"}
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Box >
     )
 }
 

@@ -19,8 +19,8 @@ const ThemeToggleButton: React.FC = () => {
         '&.Mui-focusVisible': {
           outline: 'none',
         }
-      }} 
-      onClick={toggleColorMode} 
+      }}
+      onClick={toggleColorMode}
       color="inherit"
     >
       {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}

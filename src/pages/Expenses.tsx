@@ -29,16 +29,16 @@ import {
     Select,
     FormControl,
     InputLabel,
-    Grid,
+    // Grid,
 } from "@mui/material"
 import {
     Add as AddIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
     Receipt as ReceiptIcon,
-    TrendingUp as TrendingUpIcon,
-    Category as CategoryIcon,
-    ReceiptLong as ReceiptLongIcon, // Changed from CurrencyExchangeIcon
+    // TrendingUp as TrendingUpIcon,
+    // Category as CategoryIcon,
+    // ReceiptLong as ReceiptLongIcon, // Changed from CurrencyExchangeIcon
 } from "@mui/icons-material"
 
 interface ExpenseDTO {
@@ -212,16 +212,16 @@ const Expenses: React.FC = () => {
     }
 
     // Calculate total expenses
-    const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+    // const totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
 
     // Group expenses by category
-    const expensesByCategory = expenses.reduce(
-        (acc, expense) => {
-            acc[expense.category] = (acc[expense.category] || 0) + Number(expense.amount)
-            return acc
-        },
-        {} as Record<string, number>,
-    )
+    // const expensesByCategory = expenses.reduce(
+    //     (acc, expense) => {
+    //         acc[expense.category] = (acc[expense.category] || 0) + Number(expense.amount)
+    //         return acc
+    //     },
+    //     {} as Record<string, number>,
+    // )
 
     useEffect(() => {
         fetchExpenses()
@@ -249,7 +249,8 @@ const Expenses: React.FC = () => {
                 width: "100%",
                 maxWidth: "1200px",
                 mx: "auto",
-                p: { xs: 2, md: 4 },
+                px: { xs: 4 },
+                pt: { xs: 2 },
             }}
         >
             {/* Header */}
@@ -286,7 +287,7 @@ const Expenses: React.FC = () => {
             )}
 
             {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            {/* <Grid container spacing={3} sx={{ mb: 4 }}>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <Card
                         elevation={0}
@@ -337,60 +338,60 @@ const Expenses: React.FC = () => {
                             </Typography>
                         </CardContent>
                     </Card>
-                </Grid>
+                </Grid> */}
 
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                            border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
-                        }}
-                    >
-                        <CardContent sx={{ textAlign: "center" }}>
-                            <CategoryIcon
-                                sx={{
-                                    fontSize: 40,
-                                    color: theme.palette.secondary.main,
-                                    mb: 1,
-                                }}
-                            />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.secondary.main }}>
-                                {Object.keys(expensesByCategory).length}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                                Categories Used
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.warning.main, 0.1),
-                            border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
-                        }}
-                    >
-                        <CardContent sx={{ textAlign: "center" }}>
-                            <TrendingUpIcon
-                                sx={{
-                                    fontSize: 40,
-                                    color: theme.palette.warning.main,
-                                    mb: 1,
-                                }}
-                            />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
-                                ₱{expenses.length > 0 ? (totalExpenses / expenses.length).toFixed(2) : "0.00"}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                                Average per Transaction
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            {/* <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card
+                    elevation={0}
+                    sx={{
+                        backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+                        border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
+                    }}
+                >
+                    <CardContent sx={{ textAlign: "center" }}>
+                        <CategoryIcon
+                            sx={{
+                                fontSize: 40,
+                                color: theme.palette.secondary.main,
+                                mb: 1,
+                            }}
+                        />
+                        <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.secondary.main }}>
+                            {Object.keys(expensesByCategory).length}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                            Categories Used
+                        </Typography>
+                    </CardContent>
+                </Card>
             </Grid>
+
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card
+                    elevation={0}
+                    sx={{
+                        backgroundColor: alpha(theme.palette.warning.main, 0.1),
+                        border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
+                    }}
+                >
+                    <CardContent sx={{ textAlign: "center" }}>
+                        <TrendingUpIcon
+                            sx={{
+                                fontSize: 40,
+                                color: theme.palette.warning.main,
+                                mb: 1,
+                            }}
+                        />
+                        <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
+                            ₱{expenses.length > 0 ? (totalExpenses / expenses.length).toFixed(2) : "0.00"}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                            Average per Transaction
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid> */}
 
             {/* Expenses List */}
             <Card
@@ -402,7 +403,7 @@ const Expenses: React.FC = () => {
                 }}
             >
                 <CardContent>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 600 }}>
                             Recent Expenses
                         </Typography>
@@ -597,7 +598,7 @@ const Expenses: React.FC = () => {
             >
                 <AddIcon />
             </Fab>
-        </Box>
+        </Box >
     )
 }
 

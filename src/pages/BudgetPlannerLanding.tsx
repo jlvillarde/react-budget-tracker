@@ -2,12 +2,13 @@
 import { Box, Typography, Button, Card, CardContent, Chip, Stack, useTheme, alpha, Grid } from "@mui/material"
 import {
   TrendingUp,
-  Security,
+  // LocalStorage,
   PhoneAndroid,
   SavingsOutlined,
   ArrowForward,
-  PlayArrow,
+  Visibility,
   Shield,
+  Code,
 } from "@mui/icons-material"
 
 export default function WelcomePage() {
@@ -22,9 +23,9 @@ export default function WelcomePage() {
       bgColor: alpha(theme.palette.success.main, 0.1),
     },
     {
-      icon: <Security sx={{ fontSize: 32 }} />,
-      title: "Secure & Private",
-      description: "Your financial data is encrypted and protected with bank-level security.",
+      icon: <Code sx={{ fontSize: 32 }} />,
+      title: "Local Storage",
+      description: "Your data stays on your device. Simple, fast, and keeps your information private.",
       color: theme.palette.primary.main,
       bgColor: alpha(theme.palette.primary.main, 0.1),
     },
@@ -54,7 +55,7 @@ export default function WelcomePage() {
             <Box>
               <Chip
                 icon={<SavingsOutlined />}
-                label="Smart Budget Tracking"
+                label="Simple Budget Tracking"
                 variant="outlined"
                 sx={{
                   backgroundColor: alpha(theme.palette.success.main, 0.1),
@@ -102,8 +103,7 @@ export default function WelcomePage() {
                 maxWidth: "90%",
               }}
             >
-              Track expenses, set budgets, and achieve your financial goals with our intuitive budget tracking
-              application. Start your journey to financial freedom today.
+              A simple yet powerful expense tracker to help you monitor spending, set budgets, and reach your financial goals.
             </Typography>
 
             {/* CTA Buttons */}
@@ -127,12 +127,12 @@ export default function WelcomePage() {
                   transition: "all 0.3s ease-in-out",
                 }}
               >
-                Get Started Free
+                Start Tracking
               </Button>
               <Button
                 variant="outlined"
                 size="large"
-                startIcon={<PlayArrow />}
+                startIcon={<Visibility />}
                 sx={{
                   px: 4,
                   py: 1.5,
@@ -147,19 +147,19 @@ export default function WelcomePage() {
                   },
                 }}
               >
-                Watch Demo
+                Learn More
               </Button>
             </Stack>
 
             {/* Stats */}
             <Stack direction="row" spacing={4} sx={{ pt: 3 }}>
               {[
-                { value: "50K+", label: "Active Users" },
-                { value: "$2M+", label: "Money Saved" },
-                { value: "4.9★", label: "User Rating" },
+                { value: "Easy", label: "To Use" },
+                { value: "Free", label: "Forever" },
+                { value: "Secure", label: "& Private" },
               ].map((stat, index) => (
                 <Box key={index} sx={{ textAlign: "center" }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
                     {stat.value}
                   </Typography>
                   <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
@@ -227,14 +227,14 @@ export default function WelcomePage() {
           <Stack direction="row" alignItems="center" spacing={1}>
             <Shield sx={{ fontSize: 16, color: theme.palette.text.secondary }} />
             <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-              Bank-level encryption
+              Data stays on your device
             </Typography>
           </Stack>
           <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-            Trusted by 50,000+ users worldwide
+            Simple and straightforward expense tracking
           </Typography>
           <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-            Free to start • No credit card required
+            No registration required
           </Typography>
         </Stack>
       </Box>

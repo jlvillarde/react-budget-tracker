@@ -7,7 +7,7 @@ interface ThemeContextProps {
 }
 
 const ThemeContext = createContext<ThemeContextProps>({
-  mode: 'light',
+  mode: 'dark',
   toggleColorMode: () => { },
 });
 
@@ -16,7 +16,7 @@ export const useThemeContext = () => useContext(ThemeContext);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mode, setMode] = useState<'light' | 'dark'>(() => {
     const savedMode = localStorage.getItem('theme-mode');
-    return (savedMode as 'light' | 'dark') || 'light';
+    return (savedMode as 'light' | 'dark') || 'dark';
   });
 
   const toggleColorMode = () => {
