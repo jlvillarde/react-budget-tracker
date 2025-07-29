@@ -1,17 +1,18 @@
-import type React from "react"
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import type { RouteObject } from "react-router-dom"
-import SignIn from "./pages/SignIn"
-import SignUp from "./pages/SignUp"
-import { ThemeProvider } from "./context/ThemeContext"
-import { UserProvider } from "./context/UserContext"
-import LandingPageLayout from "./layouts/LandingPageLayout"
-import DashboardLayout from "./layouts/DashboardLayout"
-import BudgetPlannerLanding from "./pages/BudgetPlannerLanding"
-import Expenses from "./pages/Expenses"
-import Settings from "./pages/Settings"
-import Analytics from "./pages/Analytics"
-import ProtectedRoute from "./components/ProtectedRoute"
+import type React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import { ThemeProvider } from "./context/ThemeContext";
+import { UserProvider } from "./context/UserContext";
+import LandingPageLayout from "./layouts/LandingPageLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
+import BudgetPlannerLanding from "./pages/BudgetPlannerLanding";
+import Expenses from "./pages/Expenses";
+import Settings from "./pages/Settings";
+import Analytics from "./pages/Analytics";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useRegisterSW } from "./hooks/useRegisterSW"; // Import the hook
 
 const routes: RouteObject[] = [
   {
@@ -36,18 +37,20 @@ const routes: RouteObject[] = [
       { path: "settings", element: <Settings /> },
     ],
   },
-]
+];
 
-const router = createBrowserRouter(routes)
+const router = createBrowserRouter(routes);
 
 const App: React.FC = () => {
+  useRegisterSW(); // Register the service worker
+
   return (
     <ThemeProvider>
       <UserProvider>
         <RouterProvider router={router} />
       </UserProvider>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default App
+export default App;
