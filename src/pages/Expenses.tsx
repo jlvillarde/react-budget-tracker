@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
     Box,
     Typography,
@@ -29,6 +29,11 @@ import {
     Select,
     FormControl,
     InputLabel,
+    Pagination,
+    InputAdornment,
+    OutlinedInput,
+    Paper,
+    // Divider,
     // Grid,
 } from "@mui/material"
 import {
@@ -36,9 +41,12 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     Receipt as ReceiptIcon,
+    FilterList as FilterListIcon,
+    Search as SearchIcon,
+    Clear as ClearIcon,
     // TrendingUp as TrendingUpIcon,
     // Category as CategoryIcon,
-    // ReceiptLong as ReceiptLongIcon, // Changed from CurrencyExchangeIcon
+    // ReceiptLong as ReceiptLongIcon,
 } from "@mui/icons-material"
 
 interface ExpenseDTO {
@@ -63,6 +71,12 @@ const Expenses: React.FC = () => {
         date: new Date().toISOString().split("T")[0],
     })
     const [submitting, setSubmitting] = useState(false)
+
+    // Pagination and filtering
+    const [page, setPage] = useState(1)
+    const [itemsPerPage] = useState(5)
+    const [filterCategory, setFilterCategory] = useState<string>("")
+    const [searchTerm, setSearchTerm] = useState<string>("")
 
     const theme = useTheme()
 
@@ -223,6 +237,31 @@ const Expenses: React.FC = () => {
     //     {} as Record<string, number>,
     // )
 
+    // Filter and pagination logic
+    const filteredExpenses = useMemo(() => {
+        return expenses.filter((expense) => {
+            const matchesCategory = !filterCategory || expense.category === filterCategory;
+            const matchesSearch = !searchTerm ||
+                expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                String(expense.amount).includes(searchTerm);
+
+            return matchesCategory && matchesSearch;
+        });
+    }, [expenses, filterCategory, searchTerm]);
+
+    const paginatedExpenses = useMemo(() => {
+        const startIndex = (page - 1) * itemsPerPage;
+        return filteredExpenses.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredExpenses, page, itemsPerPage]);
+
+    // Handle page changes
+    const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
+        setPage(newPage);
+        // Scroll to top of expense list
+        window.scrollTo({ top: 400, behavior: 'smooth' });
+    };
+
     useEffect(() => {
         fetchExpenses()
         fetchCategories()
@@ -249,7 +288,7 @@ const Expenses: React.FC = () => {
                 width: "100%",
                 maxWidth: "1200px",
                 mx: "auto",
-                px: { xs: 4 },
+                px: { xs: 2, md: 4 },
                 pt: { xs: 2 },
             }}
         >
@@ -393,6 +432,128 @@ const Expenses: React.FC = () => {
             </Grid>
         </Grid> */}
 
+            {/* Filter Bar */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 2,
+                    mb: 3,
+                    backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                    backdropFilter: "blur(10px)",
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    borderRadius: 2,
+                }}
+            >
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, alignItems: { md: 'center' } }}>
+                    <FormControl variant="outlined" size="small" sx={{ minWidth: { xs: '100%', md: 200 } }}>
+                        <InputLabel
+                            shrink
+                            sx={{
+                                backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                                px: 0.5,
+                                transform: 'translate(14px, -9px) scale(0.75)',
+                                '&.Mui-focused': {
+                                    backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                                }
+                            }}
+                        >
+                            Filter by Category
+                        </InputLabel>
+                        <Select
+                            value={filterCategory}
+                            onChange={(e) => {
+                                setFilterCategory(e.target.value)
+                                setPage(1) // Reset to first page when filter changes
+                            }}
+                            label=""
+                            notched
+                            displayEmpty
+                            renderValue={(selected) => {
+                                return selected ? selected : "All Categories";
+                            }}
+                            MenuProps={{
+                                PaperProps: {
+                                    sx: {
+                                        maxHeight: 300,
+                                        '&::-webkit-scrollbar': {
+                                            width: '8px',
+                                        },
+                                        '&::-webkit-scrollbar-track': {
+                                            backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                                            borderRadius: '4px',
+                                        },
+                                        '&::-webkit-scrollbar-thumb': {
+                                            backgroundColor: theme.palette.success.main,
+                                            borderRadius: '4px',
+                                            '&:hover': {
+                                                backgroundColor: theme.palette.success.dark,
+                                            }
+                                        }
+                                    }
+                                }
+                            }}
+                        >
+                            <MenuItem value="">
+                                All Categories
+                            </MenuItem>
+                            {categories.map((category) => (
+                                <MenuItem key={category} value={category}>
+                                    {category}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
+                    <FormControl variant="outlined" size="small" sx={{ flexGrow: 1 }}>
+                        <OutlinedInput
+                            placeholder="Search expenses..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value)
+                                setPage(1) // Reset to first page when search changes
+                            }}
+                            startAdornment={
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            }
+                            endAdornment={
+                                searchTerm && (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setSearchTerm('')}
+                                            edge="end"
+                                            size="small"
+                                        >
+                                            <ClearIcon fontSize="small" />
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
+                        />
+                    </FormControl>
+
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        size="medium"
+                        startIcon={<FilterListIcon />}
+                        onClick={() => {
+                            setFilterCategory("")
+                            setSearchTerm("")
+                            setPage(1)
+                        }}
+                        sx={{
+                            display: (filterCategory || searchTerm) ? 'flex' : 'none',
+                            alignSelf: { xs: 'flex-end', md: 'center' },
+                            backgroundColor: theme.palette.primary.main,
+                        }}
+                    >
+                        Clear Filters
+                    </Button>
+                </Box>
+            </Paper>
+
             {/* Expenses List */}
             <Card
                 elevation={0}
@@ -400,12 +561,14 @@ const Expenses: React.FC = () => {
                     backgroundColor: alpha(theme.palette.background.paper, 0.8),
                     backdropFilter: "blur(10px)",
                     border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    borderRadius: 2,
+                    mb: 3,
                 }}
             >
                 <CardContent>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                         <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                            Recent Expenses
+                            {filterCategory ? `${filterCategory} Expenses` : 'All Expenses'}
                         </Typography>
                         <Button
                             variant="contained"
@@ -422,72 +585,154 @@ const Expenses: React.FC = () => {
                         </Button>
                     </Box>
 
-                    {expenses.length === 0 ? (
+                    {filteredExpenses.length === 0 ? (
                         <Box sx={{ textAlign: "center", py: 6 }}>
                             <ReceiptIcon sx={{ fontSize: 80, color: theme.palette.text.secondary, mb: 2 }} />
                             <Typography variant="h6" sx={{ color: theme.palette.text.secondary, mb: 1 }}>
-                                No expenses yet
+                                {expenses.length === 0 ? "No expenses yet" : "No expenses match your filters"}
                             </Typography>
                             <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                                Start tracking your expenses by adding your first transaction
+                                {expenses.length === 0
+                                    ? "Start tracking your expenses by adding your first transaction"
+                                    : "Try changing your search criteria or clear filters"
+                                }
                             </Typography>
                         </Box>
                     ) : (
-                        <List>
-                            {expenses.map((expense) => (
-                                <ListItem
-                                    key={expense.id}
-                                    sx={{
-                                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                                        borderRadius: 2,
-                                        mb: 1,
-                                        backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                                    }}
-                                >
-                                    <ListItemText
-                                        primary={
-                                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                                    {expense.description}
-                                                </Typography>
-                                                <Chip
-                                                    label={expense.category}
-                                                    size="small"
-                                                    sx={{
-                                                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                                                        color: theme.palette.primary.main,
-                                                    }}
-                                                />
-                                            </Box>
-                                        }
-                                        secondary={
-                                            <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-                                                <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                                                    Date: {new Date(expense.date).toLocaleDateString()}
-                                                </Typography>
-                                                <Typography
-                                                    variant="body1"
-                                                    sx={{
-                                                        fontWeight: 600,
-                                                        color: theme.palette.success.main,
-                                                    }}
-                                                >
-                                                    ₱{Number(expense.amount).toFixed(2)}
-                                                </Typography>
-                                            </Stack>
-                                        }
+                        <>
+                            <List sx={{
+                                maxHeight: '60vh',
+                                overflowY: 'auto',
+                                '&::-webkit-scrollbar': {
+                                    width: '8px',
+                                },
+                                '&::-webkit-scrollbar-track': {
+                                    backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                                    borderRadius: '4px',
+                                },
+                                '&::-webkit-scrollbar-thumb': {
+                                    backgroundColor: theme.palette.success.main,
+                                    borderRadius: '4px',
+                                    border: `2px solid ${alpha(theme.palette.background.paper, 0.5)}`,
+                                    '&:hover': {
+                                        backgroundColor: theme.palette.success.dark,
+                                    }
+                                },
+                                scrollbarWidth: 'thin',
+                                scrollbarColor: `${theme.palette.success.main} ${alpha(theme.palette.background.paper, 0.5)}`
+                            }}>
+                                {paginatedExpenses.map((expense) => (
+                                    <ListItem
+                                        key={expense.id}
+                                        sx={{
+                                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                            borderRadius: 2,
+                                            mb: 1,
+                                            backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                            '&:hover': {
+                                                boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.1)}`,
+                                                transform: 'translateY(-2px)',
+                                            }
+                                        }}
+                                    >
+                                        <ListItemText
+                                            primary={
+                                                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                                        {expense.description}
+                                                    </Typography>
+                                                    <Chip
+                                                        label={expense.category}
+                                                        size="small"
+                                                        sx={{
+                                                            backgroundColor: filterCategory === expense.category
+                                                                ? alpha(theme.palette.success.main, 0.15)
+                                                                : alpha(theme.palette.primary.main, 0.1),
+                                                            color: filterCategory === expense.category
+                                                                ? theme.palette.success.dark
+                                                                : theme.palette.primary.main,
+                                                        }}
+                                                    />
+                                                </Box>
+                                            }
+                                            secondary={
+                                                <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+                                                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                                                        Date: {new Date(expense.date).toLocaleDateString()}
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="body1"
+                                                        sx={{
+                                                            fontWeight: 600,
+                                                            color: theme.palette.success.main,
+                                                        }}
+                                                    >
+                                                        ₱{Number(expense.amount).toFixed(2)}
+                                                    </Typography>
+                                                </Stack>
+                                            }
+                                        />
+                                        <ListItemSecondaryAction>
+                                            <IconButton
+                                                onClick={() => handleOpenDialog(expense)}
+                                                sx={{
+                                                    mr: 1,
+                                                    backgroundColor: alpha(theme.palette.primary.light, 0.1),
+                                                    '&:hover': {
+                                                        backgroundColor: alpha(theme.palette.primary.light, 0.2),
+                                                    }
+                                                }}
+                                            >
+                                                <EditIcon fontSize="small" color="primary" />
+                                            </IconButton>
+                                            <IconButton
+                                                onClick={() => expense.id && handleDeleteExpense(expense.id)}
+                                                sx={{
+                                                    backgroundColor: alpha(theme.palette.error.light, 0.1),
+                                                    '&:hover': {
+                                                        backgroundColor: alpha(theme.palette.error.light, 0.2),
+                                                    }
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" color="error" />
+                                            </IconButton>
+                                        </ListItemSecondaryAction>
+                                    </ListItem>
+                                ))}
+                            </List>
+
+                            {/* Pagination */}
+                            {filteredExpenses.length > itemsPerPage && (
+                                <Box sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    pt: 3,
+                                    borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                    mt: 2
+                                }}>
+                                    <Pagination
+                                        count={Math.ceil(filteredExpenses.length / itemsPerPage)}
+                                        page={page}
+                                        onChange={handlePageChange}
+                                        color="primary"
+                                        size="large"
+                                        sx={{
+                                            '& .MuiPaginationItem-root': {
+                                                fontSize: '1rem',
+                                            },
+                                            '& .Mui-selected': {
+                                                backgroundColor: alpha(theme.palette.success.main, 0.15),
+                                                color: theme.palette.success.dark,
+                                                '&:hover': {
+                                                    backgroundColor: alpha(theme.palette.success.main, 0.25),
+                                                }
+                                            }
+                                        }}
                                     />
-                                    <ListItemSecondaryAction>
-                                        <IconButton onClick={() => handleOpenDialog(expense)} sx={{ mr: 1 }}>
-                                            <EditIcon />
-                                        </IconButton>
-                                        <IconButton onClick={() => expense.id && handleDeleteExpense(expense.id)} color="error">
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </ListItemSecondaryAction>
-                                </ListItem>
-                            ))}
-                        </List>
+                                </Box>
+                            )}
+                        </>
                     )}
                 </CardContent>
             </Card>

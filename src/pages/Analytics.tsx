@@ -21,6 +21,7 @@ import {
     Tab,
     Tabs,
     Chip,
+    useMediaQuery,
 } from "@mui/material";
 import {
     ReceiptLong as ReceiptLongIcon,
@@ -71,6 +72,9 @@ const Analytics: React.FC = () => {
     const [activeTab, setActiveTab] = useState(0);
 
     const theme = useTheme();
+    // Check if screen is mobile size
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    // const isMedium = useMediaQuery(theme.breakpoints.down('md'));
 
     const COLORS = [
         theme.palette.primary.main,
@@ -313,7 +317,7 @@ const Analytics: React.FC = () => {
         });
 
         return days.map((day, index) => ({
-            name: day,
+            name: isMobile ? day.substring(0, 3) : day, // Shorten day names on mobile
             total: dayTotals[index],
             average: dayCounts[index] ? dayTotals[index] / dayCounts[index] : 0,
             count: dayCounts[index]
@@ -360,17 +364,18 @@ const Analytics: React.FC = () => {
                 width: "100%",
                 maxWidth: "1200px",
                 mx: "auto",
-                px: { xs: 4 },
-                pt: { xs: 2 },
+                px: { xs: 2, sm: 3, md: 4 },
+                pt: { xs: 1, sm: 2 },
             }}
         >
             {/* Header */}
-            <Box sx={{ mb: 4, textAlign: "center" }}>
+            <Box sx={{ mb: { xs: 2, sm: 3, md: 4 }, textAlign: "center" }}>
                 <Typography
-                    variant="h3"
+                    variant={isMobile ? "h4" : "h3"}
                     sx={{
                         fontWeight: 700,
-                        mb: 2,
+                        mb: { xs: 1, sm: 2 },
+                        fontSize: { xs: '1.75rem', sm: '2.25rem', md: '3rem' },
                         background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette.success.dark} 90%)`,
                         backgroundClip: "text",
                         WebkitBackgroundClip: "text",
@@ -380,10 +385,11 @@ const Analytics: React.FC = () => {
                     Expense Analytics
                 </Typography>
                 <Typography
-                    variant="h6"
+                    variant={isMobile ? "subtitle1" : "h6"}
                     sx={{
                         color: theme.palette.text.secondary,
-                        mb: 3,
+                        mb: { xs: 2, sm: 3 },
+                        fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' },
                     }}
                 >
                     Visualize and analyze your spending patterns
@@ -391,13 +397,26 @@ const Analytics: React.FC = () => {
             </Box>
 
             {/* Time Frame Selector & Download Button */}
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4, flexWrap: "wrap", gap: 2 }}>
-                <FormControl sx={{ minWidth: 200 }}>
+            <Box sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: { xs: 2, sm: 3, md: 4 },
+                flexWrap: "wrap",
+                gap: 2,
+                flexDirection: isMobile ? 'column' : 'row',
+                width: '100%'
+            }}>
+                <FormControl sx={{
+                    minWidth: isMobile ? '100%' : 200,
+                    width: isMobile ? '100%' : 'auto',
+                }}>
                     <InputLabel>Time Frame</InputLabel>
                     <Select
                         value={timeFrame}
                         label="Time Frame"
                         onChange={handleTimeFrameChange}
+                        size={isMobile ? "small" : "medium"}
                     >
                         <MenuItem value="week">Last 7 Days</MenuItem>
                         <MenuItem value="month">Last 30 Days</MenuItem>
@@ -410,9 +429,11 @@ const Analytics: React.FC = () => {
                 <Button
                     variant="outlined"
                     startIcon={<DownloadIcon />}
+                    size={isMobile ? "small" : "medium"}
                     sx={{
                         borderColor: theme.palette.success.main,
                         color: theme.palette.success.main,
+                        width: isMobile ? '100%' : 'auto',
                         "&:hover": {
                             borderColor: theme.palette.success.dark,
                             backgroundColor: alpha(theme.palette.success.main, 0.1),
@@ -425,8 +446,8 @@ const Analytics: React.FC = () => {
             </Box>
 
             {/* Summary Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <Grid container spacing={isMobile ? 1 : 3} sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
+                <Grid size={{ xs: 6, md: 3 }}>
                     <Card
                         elevation={0}
                         sx={{
@@ -435,25 +456,43 @@ const Analytics: React.FC = () => {
                             height: "100%",
                         }}
                     >
-                        <CardContent sx={{ textAlign: "center" }}>
+                        <CardContent sx={{
+                            textAlign: "center",
+                            py: isMobile ? 1 : 2,
+                            px: isMobile ? 1 : 2,
+                            "&:last-child": { pb: isMobile ? 1 : 2 }
+                        }}>
                             <ReceiptLongIcon
                                 sx={{
-                                    fontSize: 40,
+                                    fontSize: isMobile ? 24 : 40,
                                     color: theme.palette.success.main,
-                                    mb: 1,
+                                    mb: 0.5,
                                 }}
                             />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.success.main }}>
+                            <Typography
+                                variant={isMobile ? "h6" : "h4"}
+                                sx={{
+                                    fontWeight: 700,
+                                    color: theme.palette.success.main,
+                                    fontSize: { xs: '1.1rem', sm: '1.5rem' },
+                                }}
+                            >
                                 ₱{totalExpense.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                            <Typography
+                                variant={isMobile ? "caption" : "body2"}
+                                sx={{
+                                    color: theme.palette.text.secondary,
+                                    fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                                }}
+                            >
                                 Total Expenses
                             </Typography>
                         </CardContent>
                     </Card>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 6, md: 3 }}>
                     <Card
                         elevation={0}
                         sx={{
@@ -462,25 +501,43 @@ const Analytics: React.FC = () => {
                             height: "100%",
                         }}
                     >
-                        <CardContent sx={{ textAlign: "center" }}>
+                        <CardContent sx={{
+                            textAlign: "center",
+                            py: isMobile ? 1 : 2,
+                            px: isMobile ? 1 : 2,
+                            "&:last-child": { pb: isMobile ? 1 : 2 }
+                        }}>
                             <LineChartIcon
                                 sx={{
-                                    fontSize: 40,
+                                    fontSize: isMobile ? 24 : 40,
                                     color: theme.palette.primary.main,
-                                    mb: 1,
+                                    mb: 0.5,
                                 }}
                             />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                            <Typography
+                                variant={isMobile ? "h6" : "h4"}
+                                sx={{
+                                    fontWeight: 700,
+                                    color: theme.palette.primary.main,
+                                    fontSize: { xs: '1.1rem', sm: '1.5rem' },
+                                }}
+                            >
                                 ₱{averageExpense.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                            <Typography
+                                variant={isMobile ? "caption" : "body2"}
+                                sx={{
+                                    color: theme.palette.text.secondary,
+                                    fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                                }}
+                            >
                                 Average per Transaction
                             </Typography>
                         </CardContent>
                     </Card>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 6, md: 3 }}>
                     <Card
                         elevation={0}
                         sx={{
@@ -489,27 +546,45 @@ const Analytics: React.FC = () => {
                             height: "100%",
                         }}
                     >
-                        <CardContent sx={{ textAlign: "center" }}>
+                        <CardContent sx={{
+                            textAlign: "center",
+                            py: isMobile ? 1 : 2,
+                            px: isMobile ? 1 : 2,
+                            "&:last-child": { pb: isMobile ? 1 : 2 }
+                        }}>
                             <PieChartIcon
                                 sx={{
-                                    fontSize: 40,
+                                    fontSize: isMobile ? 24 : 40,
                                     color: theme.palette.secondary.main,
-                                    mb: 1,
+                                    mb: 0.5,
                                 }}
                             />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.secondary.main }}>
+                            <Typography
+                                variant={isMobile ? "h6" : "h4"}
+                                sx={{
+                                    fontWeight: 700,
+                                    color: theme.palette.secondary.main,
+                                    fontSize: { xs: '1.1rem', sm: '1.5rem' },
+                                }}
+                            >
                                 {highestExpenseCategory.name !== "None"
                                     ? highestExpenseCategory.name.split(' ')[0]
                                     : "None"}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                            <Typography
+                                variant={isMobile ? "caption" : "body2"}
+                                sx={{
+                                    color: theme.palette.text.secondary,
+                                    fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                                }}
+                            >
                                 Top Spending Category
                             </Typography>
                         </CardContent>
                     </Card>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid size={{ xs: 6, md: 3 }}>
                     <Card
                         elevation={0}
                         sx={{
@@ -518,18 +593,36 @@ const Analytics: React.FC = () => {
                             height: "100%",
                         }}
                     >
-                        <CardContent sx={{ textAlign: "center" }}>
+                        <CardContent sx={{
+                            textAlign: "center",
+                            py: isMobile ? 1 : 2,
+                            px: isMobile ? 1 : 2,
+                            "&:last-child": { pb: isMobile ? 1 : 2 }
+                        }}>
                             <CalendarIcon
                                 sx={{
-                                    fontSize: 40,
+                                    fontSize: isMobile ? 24 : 40,
                                     color: theme.palette.warning.main,
-                                    mb: 1,
+                                    mb: 0.5,
                                 }}
                             />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
+                            <Typography
+                                variant={isMobile ? "h6" : "h4"}
+                                sx={{
+                                    fontWeight: 700,
+                                    color: theme.palette.warning.main,
+                                    fontSize: { xs: '1.1rem', sm: '1.5rem' },
+                                }}
+                            >
                                 {filteredExpenses.length}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                            <Typography
+                                variant={isMobile ? "caption" : "body2"}
+                                sx={{
+                                    color: theme.palette.text.secondary,
+                                    fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                                }}
+                            >
                                 Transactions
                             </Typography>
                         </CardContent>
@@ -538,7 +631,17 @@ const Analytics: React.FC = () => {
             </Grid>
 
             {/* Chart Navigation */}
-            <Box sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}>
+            <Box
+                sx={{
+                    mb: 2,
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    width: '100%',
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    position: 'relative',
+                }}
+            >
                 <Tabs
                     value={activeTab}
                     onChange={handleTabChange}
@@ -546,17 +649,89 @@ const Analytics: React.FC = () => {
                     indicatorColor="primary"
                     variant="scrollable"
                     scrollButtons="auto"
+                    allowScrollButtonsMobile
                     sx={{
+                        width: '100%',
+                        maxWidth: '100%',
+                        minHeight: isMobile ? 40 : 48,
+                        '& .MuiTabs-flexContainer': {
+                            minWidth: 'max-content',
+                        },
+                        '& .MuiTabs-scroller': {
+                            overflow: 'auto',
+                            scrollbarWidth: 'none',
+                            '&::-webkit-scrollbar': {
+                                display: 'none',
+                            },
+                        },
+                        '& .MuiTabs-scrollButtons': {
+                            width: { xs: 24, sm: 30, md: 40 },
+                            '&.Mui-disabled': {
+                                opacity: 0.3,
+                            },
+                        },
                         '& .MuiTab-root': {
                             fontWeight: 600,
                             textTransform: 'none',
-                        }
+                            fontSize: { xs: '0.65rem', sm: '0.75rem', md: '0.875rem' },
+                            minWidth: { xs: 60, sm: 80, md: 120 },
+                            maxWidth: { xs: 100, sm: 140, md: 200 },
+                            px: { xs: 0.5, sm: 1, md: 1.5 },
+                            py: { xs: 0.75, sm: 1, md: 1.5 },
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            minHeight: isMobile ? 40 : 48,
+                        },
+                        '& .MuiTabs-indicator': {
+                            height: 3,
+                        },
                     }}
                 >
-                    <Tab icon={<PieChartIcon sx={{ mr: 1 }} />} iconPosition="start" label="Category Breakdown" />
-                    <Tab icon={<BarChartIcon sx={{ mr: 1 }} />} iconPosition="start" label="Monthly Trends" />
-                    <Tab icon={<LineChartIcon sx={{ mr: 1 }} />} iconPosition="start" label="Daily Spending" />
-                    <Tab icon={<CalendarIcon sx={{ mr: 1 }} />} iconPosition="start" label="Day of Week Analysis" />
+                    <Tab
+                        icon={<PieChartIcon sx={{ fontSize: { xs: '1.5rem', sm: '0.9rem', md: '1.1rem' } }} />}
+                        iconPosition="start"
+                        label={
+                            <Box component="span" sx={{
+                                display: { xs: 'none', sm: 'inline' }
+                            }}>
+                                Category Breakdown
+                            </Box>
+                        }
+                    />
+                    <Tab
+                        icon={<BarChartIcon sx={{ fontSize: { xs: '1.5rem', sm: '0.9rem', md: '1.1rem' } }} />}
+                        iconPosition="start"
+                        label={
+                            <Box component="span" sx={{
+                                display: { xs: 'none', sm: 'inline' }
+                            }}>
+                                Monthly Trends
+                            </Box>
+                        }
+                    />
+                    <Tab
+                        icon={<LineChartIcon sx={{ fontSize: { xs: '1.5rem', sm: '0.9rem', md: '1.1rem' } }} />}
+                        iconPosition="start"
+                        label={
+                            <Box component="span" sx={{
+                                display: { xs: 'none', sm: 'inline' }
+                            }}>
+                                Daily Spending
+                            </Box>
+                        }
+                    />
+                    <Tab
+                        icon={<CalendarIcon sx={{ fontSize: { xs: '1.5rem', sm: '0.9rem', md: '1.1rem' } }} />}
+                        iconPosition="start"
+                        label={
+                            <Box component="span" sx={{
+                                display: { xs: 'none', sm: 'inline' }
+                            }}>
+                                Day of Week Analysis
+                            </Box>
+                        }
+                    />
                 </Tabs>
             </Box>
 
@@ -569,10 +744,13 @@ const Analytics: React.FC = () => {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                             backdropFilter: "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            p: 2
+                            p: {
+                                xs: 1,
+                                sm: 2
+                            }
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
                             <Typography variant="h5" sx={{ fontWeight: 600 }}>
                                 Expense Distribution by Category
                             </Typography>
@@ -680,10 +858,13 @@ const Analytics: React.FC = () => {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                             backdropFilter: "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            p: 2
+                            p: {
+                                xs: 1,
+                                sm: 2
+                            }
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
                             <Typography variant="h5" sx={{ fontWeight: 600 }}>
                                 Monthly Expense Trends
                             </Typography>
@@ -745,10 +926,13 @@ const Analytics: React.FC = () => {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                             backdropFilter: "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            p: 2
+                            p: {
+                                xs: 1,
+                                sm: 2
+                            }
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
                             <Typography variant="h5" sx={{ fontWeight: 600 }}>
                                 Daily Spending Patterns
                             </Typography>
@@ -813,10 +997,13 @@ const Analytics: React.FC = () => {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                             backdropFilter: "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            p: 2
+                            p: {
+                                xs: 1,
+                                sm: 2
+                            }
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
                             <Typography variant="h5" sx={{ fontWeight: 600 }}>
                                 Spending by Day of Week
                             </Typography>
