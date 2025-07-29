@@ -12,7 +12,7 @@ import Expenses from "./pages/Expenses";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useRegisterSW } from "./hooks/useRegisterSW"; // Import the hook
+import { usePWA } from "./hooks/usePWA"; // Import the hook
 
 const routes: RouteObject[] = [
   {
@@ -42,7 +42,7 @@ const routes: RouteObject[] = [
 const router = createBrowserRouter(routes);
 
 const App: React.FC = () => {
-  useRegisterSW(); // Register the service worker
+  usePWA(); // Register the service worker
 
   return (
     <ThemeProvider>

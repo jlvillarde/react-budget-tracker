@@ -10,6 +10,7 @@ import {
   Shield,
   Code,
 } from "@mui/icons-material"
+import InstallPrompt from "../components/InstallPrompt"
 
 export default function WelcomePage() {
   const theme = useTheme()
@@ -47,6 +48,7 @@ export default function WelcomePage() {
 
   return (
     <Box sx={{ width: "100%", maxWidth: "1200px" }}>
+      <InstallPrompt />
       <Grid container spacing={6} alignItems="center" sx={{ minHeight: "70vh" }} py={2}>
         {/* Left Column - Hero Content */}
         <Grid size={{ xs: 12, lg: 6 }}>

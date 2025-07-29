@@ -384,7 +384,7 @@ const DashboardLayout: React.FC = () => {
                                 },
                             }}
                         >
-                            <Badge badgeContent={8} color="error">
+                            <Badge badgeContent={3} color="error">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
