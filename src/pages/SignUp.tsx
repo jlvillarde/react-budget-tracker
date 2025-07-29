@@ -203,6 +203,7 @@ const SignUp: React.FC = () => {
                 WebkitTextFillColor: "transparent",
                 lineHeight: 1.2,
                 mb: { xs: 1, md: 3 },
+                fontSize: { xs: "1.2rem", sm: "1.5rem", md: "3rem" },
               }}
             >
               Join BudgetTracker

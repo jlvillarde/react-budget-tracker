@@ -72,7 +72,7 @@ export default function WelcomePage() {
               component="h1"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: "2.5rem", md: "3.5rem", lg: "4rem" },
+                fontSize: { xs: "1.8rem", sm: "2.2rem", md: "3.5rem", lg: "4rem" },
                 lineHeight: 1.2,
                 color: theme.palette.text.primary,
               }}
@@ -101,6 +101,7 @@ export default function WelcomePage() {
                 fontWeight: 400,
                 lineHeight: 1.6,
                 maxWidth: "90%",
+                fontSize: { xs: "1rem", sm: "1.2rem", md: "1.25rem" },
               }}
             >
               A simple yet powerful expense tracker to help you monitor spending, set budgets, and reach your financial goals.

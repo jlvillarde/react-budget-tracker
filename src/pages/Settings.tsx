@@ -311,6 +311,7 @@ const Settings: React.FC = () => {
                         backgroundClip: "text",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
+                        fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2.125rem" },
                     }}
                 >
                     Settings

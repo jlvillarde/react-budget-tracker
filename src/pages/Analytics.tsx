@@ -673,15 +673,15 @@ const Analytics: React.FC = () => {
                         '& .MuiTab-root': {
                             fontWeight: 600,
                             textTransform: 'none',
-                            fontSize: { xs: '0.65rem', sm: '0.75rem', md: '0.875rem' },
-                            minWidth: { xs: 60, sm: 80, md: 120 },
-                            maxWidth: { xs: 100, sm: 140, md: 200 },
-                            px: { xs: 0.5, sm: 1, md: 1.5 },
-                            py: { xs: 0.75, sm: 1, md: 1.5 },
+                            fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                            minWidth: { xs: 80, sm: 100, md: 120 },
+                            maxWidth: { xs: 120, sm: 140, md: 200 },
+                            px: { xs: 1, sm: 1.5, md: 1.5 },
+                            py: { xs: 1, sm: 1.25, md: 1.5 },
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            minHeight: isMobile ? 40 : 48,
+                            minHeight: isMobile ? 48 : 48,
                         },
                         '& .MuiTabs-indicator': {
                             height: 3,
@@ -764,7 +764,7 @@ const Analytics: React.FC = () => {
                         <Grid container spacing={3}>
                             <Grid size={{ xs: 12, md: 8 }}>
                                 {expensesByCategory.length > 0 ? (
-                                    <Box sx={{ height: 400 }}>
+                                    <Box sx={{ height: { xs: 300, sm: 350, md: 400 } }}>
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
                                                 <Pie
@@ -772,10 +772,10 @@ const Analytics: React.FC = () => {
                                                     cx="50%"
                                                     cy="50%"
                                                     labelLine={false}
-                                                    outerRadius={150}
+                                                    outerRadius={isMobile ? 80 : 150}
                                                     fill="#8884d8"
                                                     dataKey="value"
-                                                    label={(props) =>
+                                                    label={isMobile ? false : (props) =>
                                                         props.name && typeof props.percent === 'number'
                                                             ? `${props.name}: ${(props.percent * 100).toFixed(0)}%`
                                                             : ''
@@ -786,12 +786,13 @@ const Analytics: React.FC = () => {
                                                     ))}
                                                 </Pie>
                                                 <RechartsTooltip formatter={(value: number) => `₱${value}`} />
+                                                {!isMobile && <Legend />}
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </Box>
                                 ) : (
-                                    <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                                    <Box sx={{ height: { xs: 300, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: { xs: '1rem', md: '1.25rem' } }}>
                                             No expense data available
                                         </Typography>
                                     </Box>
@@ -876,20 +877,35 @@ const Analytics: React.FC = () => {
                         </Box>
 
                         {monthlyExpenseData.length > 0 ? (
-                            <Box sx={{ height: 400 }}>
+                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 } }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={monthlyExpenseData}
-                                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                        margin={{ 
+                                            top: 20, 
+                                            right: isMobile ? 10 : 30, 
+                                            left: isMobile ? 10 : 20, 
+                                            bottom: 5 
+                                        }}
                                     >
                                         <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
                                         <XAxis
                                             dataKey="month"
-                                            tick={{ fill: theme.palette.text.secondary }}
+                                            tick={{ 
+                                                fill: theme.palette.text.secondary, 
+                                                fontSize: isMobile ? 10 : 12 
+                                            }}
+                                            angle={isMobile ? -45 : 0}
+                                            textAnchor={isMobile ? 'end' : 'middle'}
+                                            height={isMobile ? 60 : 30}
                                         />
                                         <YAxis
-                                            tick={{ fill: theme.palette.text.secondary }}
-                                            tickFormatter={(value) => `₱${value}`}
+                                            tick={{ 
+                                                fill: theme.palette.text.secondary, 
+                                                fontSize: isMobile ? 10 : 12 
+                                            }}
+                                            tickFormatter={(value) => isMobile ? `₱${(value/1000).toFixed(0)}k` : `₱${value}`}
+                                            width={isMobile ? 40 : 60}
                                         />
                                         <RechartsTooltip
                                             formatter={(value) => `₱${value}`}
@@ -897,9 +913,10 @@ const Analytics: React.FC = () => {
                                                 backgroundColor: alpha(theme.palette.background.paper, 0.9),
                                                 border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
                                                 borderRadius: 8,
+                                                fontSize: isMobile ? 12 : 14,
                                             }}
                                         />
-                                        <Legend />
+                                        {!isMobile && <Legend />}
                                         <Bar
                                             dataKey="amount"
                                             name="Total Expenses"
@@ -910,8 +927,8 @@ const Analytics: React.FC = () => {
                                 </ResponsiveContainer>
                             </Box>
                         ) : (
-                            <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: { xs: '1rem', md: '1.25rem' } }}>
                                     No expense data available
                                 </Typography>
                             </Box>
@@ -944,20 +961,32 @@ const Analytics: React.FC = () => {
                         </Box>
 
                         {dailyExpenseData.length > 0 ? (
-                            <Box sx={{ height: 400 }}>
+                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 } }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart
                                         data={dailyExpenseData}
-                                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                        margin={{ 
+                                            top: 20, 
+                                            right: isMobile ? 10 : 30, 
+                                            left: isMobile ? 10 : 20, 
+                                            bottom: 5 
+                                        }}
                                     >
                                         <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
                                         <XAxis
                                             dataKey="date"
-                                            tick={{ fill: theme.palette.text.secondary }}
+                                            tick={{ 
+                                                fill: theme.palette.text.secondary, 
+                                                fontSize: isMobile ? 10 : 12 
+                                            }}
                                         />
                                         <YAxis
-                                            tick={{ fill: theme.palette.text.secondary }}
-                                            tickFormatter={(value) => `₱${value}`}
+                                            tick={{ 
+                                                fill: theme.palette.text.secondary, 
+                                                fontSize: isMobile ? 10 : 12 
+                                            }}
+                                            tickFormatter={(value) => isMobile ? `₱${(value/1000).toFixed(0)}k` : `₱${value}`}
+                                            width={isMobile ? 40 : 60}
                                         />
                                         <RechartsTooltip
                                             formatter={(value) => `₱${value}`}
@@ -965,24 +994,25 @@ const Analytics: React.FC = () => {
                                                 backgroundColor: alpha(theme.palette.background.paper, 0.9),
                                                 border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
                                                 borderRadius: 8,
+                                                fontSize: isMobile ? 12 : 14,
                                             }}
                                         />
-                                        <Legend />
+                                        {!isMobile && <Legend />}
                                         <Line
                                             type="monotone"
                                             dataKey="amount"
                                             name="Daily Expenses"
                                             stroke={theme.palette.success.main}
-                                            strokeWidth={2}
-                                            dot={{ r: 4, fill: theme.palette.success.main }}
-                                            activeDot={{ r: 6 }}
+                                            strokeWidth={isMobile ? 1.5 : 2}
+                                            dot={{ r: isMobile ? 2 : 4, fill: theme.palette.success.main }}
+                                            activeDot={{ r: isMobile ? 4 : 6 }}
                                         />
                                     </LineChart>
                                 </ResponsiveContainer>
                             </Box>
                         ) : (
-                            <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: { xs: '1rem', md: '1.25rem' } }}>
                                     No expense data available
                                 </Typography>
                             </Box>

@@ -303,6 +303,7 @@ const Expenses: React.FC = () => {
                         backgroundClip: "text",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
+                        fontSize: { xs: "1.8rem", sm: "2.2rem", md: "3rem" },
                     }}
                 >
                     Expense Tracker
