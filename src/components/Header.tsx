@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ children, title = "BudgetTracker" }) =>
         color: theme.palette.text.primary,
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Toolbar
           sx={{
             px: { xs: 1, sm: 2 },

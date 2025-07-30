@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Icon Generator</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .icon-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+
+    .icon-wrapper {
+      text-align: center;
+      margin: 10px;
+    }
+
+    .icon {
+      border-radius: 20%;
+      background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(46, 125, 50, 0.3);
+      transition: all 0.3s ease-in-out;
+      cursor: pointer;
+    }
+
+    .icon:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(46, 125, 50, 0.4);
+    }
+
+    .mui-icon {
+      fill: white;
+    }
+
+    .size-16 {
+      width: 16px;
+      height: 16px;
+    }
+
+    .size-16 .mui-icon {
+      width: 10px;
+      height: 10px;
+    }
+
+    .size-32 {
+      width: 32px;
+      height: 32px;
+    }
+
+    .size-32 .mui-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .size-72 {
+      width: 72px;
+      height: 72px;
+    }
+
+    .size-72 .mui-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .size-96 {
+      width: 96px;
+      height: 96px;
+    }
+
+    .size-96 .mui-icon {
+      width: 52px;
+      height: 52px;
+    }
+
+    .size-128 {
+      width: 128px;
+      height: 128px;
+    }
+
+    .size-128 .mui-icon {
+      width: 70px;
+      height: 70px;
+    }
+
+    .size-144 {
+      width: 144px;
+      height: 144px;
+    }
+
+    .size-144 .mui-icon {
+      width: 78px;
+      height: 78px;
+    }
+
+    .size-152 {
+      width: 152px;
+      height: 152px;
+    }
+
+    .size-152 .mui-icon {
+      width: 82px;
+      height: 82px;
+    }
+
+    .size-192 {
+      width: 192px;
+      height: 192px;
+    }
+
+    .size-192 .mui-icon {
+      width: 104px;
+      height: 104px;
+    }
+
+    .size-384 {
+      width: 384px;
+      height: 384px;
+    }
+
+    .size-384 .mui-icon {
+      width: 208px;
+      height: 208px;
+    }
+
+    .size-512 {
+      width: 512px;
+      height: 512px;
+    }
+
+    .size-512 .mui-icon {
+      width: 278px;
+      height: 278px;
+    }
+
+    .label {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .instructions {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 0 auto 30px;
+    }
+
+    .instructions h1 {
+      color: #2e7d32;
+      margin-bottom: 15px;
+    }
+
+    .instructions p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .download-btn {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      margin-top: 5px;
+      transition: background 0.2s;
+    }
+
+    .download-btn:hover {
+      background: #1b5e20;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="instructions">
+    <h1>Budget Tracker PWA Icons & Favicons</h1>
+    <p><strong>Instructions:</strong> Right-click on each icon below and select "Save image as..." to download the PNG files.</p>
+    <p><strong>PWA Icons:</strong> Save with filenames like icon-72x72.png in your <code>/public/icons/</code> folder.</p>
+    <p><strong>Favicons:</strong> Save the 16x16, 32x32, and 192x192 icons as favicon files in your <code>/public/</code> folder.</p>
+    <p>These icons use the same AccountBalance icon and green gradient as your header component.</p>
+  </div>
+
+  <div class="icon-container">
+    {/* Favicon sizes */}
+    <div class="icon-wrapper">
+      <div class="icon size-16" data-size="16">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">16x16px (favicon)</div>
+      <button class="download-btn" onclick="downloadIcon(16, 'favicon-16x16')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-32" data-size="32">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">32x32px (favicon)</div>
+      <button class="download-btn" onclick="downloadIcon(32, 'favicon-32x32')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-72" data-size="72">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">72x72px</div>
+      <button class="download-btn" onclick="downloadIcon(72, 'icon-72x72')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-96" data-size="96">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">96x96px</div>
+      <button class="download-btn" onclick="downloadIcon(96, 'icon-96x96')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-128" data-size="128">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">128x128px</div>
+      <button class="download-btn" onclick="downloadIcon(128, 'icon-128x128')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-144" data-size="144">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">144x144px</div>
+      <button class="download-btn" onclick="downloadIcon(144, 'icon-144x144')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-152" data-size="152">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">152x152px</div>
+      <button class="download-btn" onclick="downloadIcon(152, 'icon-152x152')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-192" data-size="192">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">192x192px</div>
+      <button class="download-btn" onclick="downloadIcon(192, 'icon-192x192')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-384" data-size="384">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">384x384px</div>
+      <button class="download-btn" onclick="downloadIcon(384, 'icon-384x384')">Download PNG</button>
+    </div>
+
+    <div class="icon-wrapper">
+      <div class="icon size-512" data-size="512">
+        <svg class="mui-icon" viewBox="0 0 24 24">
+          <path d="M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z" />
+        </svg>
+      </div>
+      <div class="label">512x512px</div>
+      <button class="download-btn" onclick="downloadIcon(512, 'icon-512x512')">Download PNG</button>
+    </div>
+  </div>
+
+  <script>
+    function downloadIcon(size, filename = `icon-${size}x${size}`) {
+      const iconElement = document.querySelector(`[data-size="${size}"]`);
+
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Create gradient background
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#2e7d32');
+      gradient.addColorStop(1, '#1b5e20');
+
+      // Draw background with rounded corners
+      const cornerRadius = size * 0.2;
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, cornerRadius);
+      ctx.fill();
+
+      // Calculate icon size (approximately 54% of container)
+      const iconSize = Math.floor(size * 0.54);
+      const iconX = (size - iconSize) / 2;
+      const iconY = (size - iconSize) / 2;
+
+      // Draw the MUI AccountBalance SVG path
+      const svgSize = 24; // Original SVG viewBox size
+      const scale = iconSize / svgSize;
+
+      ctx.fillStyle = 'white';
+      ctx.save();
+      ctx.translate(iconX, iconY);
+      ctx.scale(scale, scale);
+
+      // MUI AccountBalance SVG path
+      const path = new Path2D('M4 10v7h3v-7H4zm6 0v7h3v-7h-3zM2 22h19v-3H2v3zm14-12v7h3v-7h-3zm-4.5-9L2 6v2h19V6l-9.5-5z');
+      ctx.fill(path);
+
+      ctx.restore();
+
+      // Download the image
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${filename}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    }
+
+    // Add roundRect polyfill for older browsers
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+        this.moveTo(x + radius, y);
+        this.lineTo(x + width - radius, y);
+        this.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.lineTo(x + width, y + height - radius);
+        this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.lineTo(x + radius, y + height);
+        this.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.lineTo(x, y + radius);
+        this.quadraticCurveTo(x, y, x + radius, y);
+        this.closePath();
+      };
+    }
+  </script>
+</body>
+
+</html>

@@ -2,18 +2,60 @@
 import { Box, Typography, Button, Card, CardContent, Chip, Stack, useTheme, alpha, Grid } from "@mui/material"
 import {
   TrendingUp,
-  // LocalStorage,
   PhoneAndroid,
   SavingsOutlined,
   ArrowForward,
-  Visibility,
   Shield,
   Code,
+  GetApp,
 } from "@mui/icons-material"
-import InstallPrompt from "../components/InstallPrompt"
+import { usePWA } from "../hooks/usePWA"
 
 export default function WelcomePage() {
   const theme = useTheme()
+  const { installStatus, installApp } = usePWA()
+
+  const getInstallButtonProps = () => {
+    switch (installStatus) {
+      case 'installed':
+        return {
+          text: 'App Installed ✓',
+          icon: <GetApp />,
+          disabled: true,
+          color: theme.palette.success.main,
+          onClick: () => { }
+        };
+      case 'installable':
+        return {
+          text: 'Install App',
+          icon: <GetApp />,
+          disabled: false,
+          color: theme.palette.primary.main,
+          onClick: installApp
+        };
+      case 'not-supported':
+        return {
+          text: 'Add to Home Screen',
+          icon: <GetApp />,
+          disabled: false,
+          color: theme.palette.primary.main,
+          onClick: () => {
+            // Show instructions for manual installation
+            alert('To install this app:\n\n• Chrome: Menu → "Install Budget Tracker"\n• Safari: Share → "Add to Home Screen"\n• Edge: Menu → "Apps" → "Install this site as an app"');
+          }
+        };
+      default:
+        return {
+          text: 'Install App',
+          icon: <GetApp />,
+          disabled: false,
+          color: theme.palette.primary.main,
+          onClick: installApp
+        };
+    }
+  };
+
+  const installButtonProps = getInstallButtonProps();
 
   const features = [
     {
@@ -48,7 +90,6 @@ export default function WelcomePage() {
 
   return (
     <Box sx={{ width: "100%", maxWidth: "1200px" }}>
-      <InstallPrompt />
       <Grid container spacing={6} alignItems="center" sx={{ minHeight: "70vh" }} py={2}>
         {/* Left Column - Hero Content */}
         <Grid size={{ xs: 12, lg: 6 }}>
@@ -74,14 +115,14 @@ export default function WelcomePage() {
               component="h1"
               sx={{
                 fontWeight: 700,
-                fontSize: { xs: "1.8rem", sm: "2.2rem", md: "3.5rem", lg: "4rem" },
+                fontSize: { xs: "2.5rem", md: "3.5rem", lg: "4rem" },
                 lineHeight: 1.2,
                 color: theme.palette.text.primary,
               }}
             >
               Take Control of Your{" "}
               <Typography
-                // component="span"
+                component="span"
                 sx={{
                   background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette.success.dark} 90%)`,
                   backgroundClip: "text",
@@ -103,7 +144,6 @@ export default function WelcomePage() {
                 fontWeight: 400,
                 lineHeight: 1.6,
                 maxWidth: "90%",
-                fontSize: { xs: "1rem", sm: "1.2rem", md: "1.25rem" },
               }}
             >
               A simple yet powerful expense tracker to help you monitor spending, set budgets, and reach your financial goals.
@@ -132,25 +172,37 @@ export default function WelcomePage() {
               >
                 Start Tracking
               </Button>
+
+              {/* PWA Install Button - Always visible with different states */}
               <Button
                 variant="outlined"
                 size="large"
-                startIcon={<Visibility />}
+                startIcon={installButtonProps.icon}
+                onClick={installButtonProps.onClick}
+                disabled={installButtonProps.disabled}
                 sx={{
                   px: 4,
                   py: 1.5,
                   fontSize: "1.1rem",
                   fontWeight: 600,
-                  borderColor: theme.palette.text.secondary,
-                  color: theme.palette.text.primary,
-                  "&:hover": {
-                    borderColor: theme.palette.primary.main,
-                    color: theme.palette.primary.main,
-                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                  borderColor: installButtonProps.disabled ? theme.palette.success.main : installButtonProps.color,
+                  color: installButtonProps.disabled ? theme.palette.success.main : installButtonProps.color,
+                  "&:hover": installButtonProps.disabled ? {} : {
+                    borderColor: theme.palette.primary.dark,
+                    color: theme.palette.primary.dark,
+                    backgroundColor: alpha(installButtonProps.color, 0.05),
+                    transform: "translateY(-2px)",
+                    boxShadow: `0 4px 12px ${alpha(installButtonProps.color, 0.2)}`,
                   },
+                  "&:disabled": {
+                    borderColor: theme.palette.success.main,
+                    color: theme.palette.success.main,
+                    opacity: 0.7,
+                  },
+                  transition: "all 0.3s ease-in-out",
                 }}
               >
-                Learn More
+                {installButtonProps.text}
               </Button>
             </Stack>
 
