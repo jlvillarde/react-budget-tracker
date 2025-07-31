@@ -11,80 +11,164 @@ interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
 }
 
+const PWA_INSTALLED_KEY = 'pwa-installation-state';
+
 export const usePWA = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState<boolean>(false);
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
 
   useEffect(() => {
-    // Check if app is already installed
-    const checkIfInstalled = () => {
-      // Check if running in standalone mode (PWA installed)
+    // Check if currently running as installed PWA
+    const isCurrentlyRunningAsPWA = () => {
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-      // Check if running in browser but added to home screen (iOS)
       const isIOSInstalled = (window.navigator as any).standalone === true;
-      // Check if running in TWA (Android)
       const isTWA = document.referrer.includes('android-app://');
+      const isMinimalUI = window.matchMedia('(display-mode: minimal-ui)').matches;
 
-      return isStandalone || isIOSInstalled || isTWA;
+      return isStandalone || isIOSInstalled || isTWA || isMinimalUI;
     };
 
-    setIsInstalled(checkIfInstalled());
+    // Check if PWA was ever installed (persisted state)
+    const wasEverInstalled = () => {
+      try {
+        const stored = localStorage.getItem(PWA_INSTALLED_KEY);
+        return stored === 'true';
+      } catch {
+        return false;
+      }
+    };
+
+    // Determine installation state
+    const determineInstallationState = () => {
+      const currentlyPWA = isCurrentlyRunningAsPWA();
+      const wasInstalled = wasEverInstalled();
+
+      console.log('PWA State Check:', {
+        currentlyRunningAsPWA: currentlyPWA,
+        wasEverInstalled: wasInstalled,
+        context: currentlyPWA ? 'PWA App' : 'Browser'
+      });
+
+      // If currently running as PWA, definitely installed
+      if (currentlyPWA) {
+        // Make sure we mark it as installed in storage
+        try {
+          localStorage.setItem(PWA_INSTALLED_KEY, 'true');
+        } catch (e) {
+          console.log('Could not save install state:', e);
+        }
+        return true;
+      }
+
+      // If not currently PWA, check if it was ever installed
+      return wasInstalled;
+    };
+
+    const initialInstallState = determineInstallationState();
+    setIsInstalled(initialInstallState);
 
     const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
-      // Prevent the mini-infobar from appearing on mobile
+      console.log('beforeinstallprompt event fired - app is installable');
       e.preventDefault();
-      // Save the event so it can be triggered later
       setDeferredPrompt(e);
       setIsInstallable(true);
+
+      // If we get this event, the app is definitely not installed yet
+      // (browsers don't fire this for already installed apps)
+      setIsInstalled(false);
+      try {
+        localStorage.removeItem(PWA_INSTALLED_KEY);
+      } catch (e) {
+        console.log('Could not clear install state:', e);
+      }
     };
 
     const handleAppInstalled = () => {
-      console.log('PWA was installed');
+      console.log('PWA installation completed');
       setIsInstallable(false);
       setIsInstalled(true);
       setDeferredPrompt(null);
+
+      // Persist the installation state
+      try {
+        localStorage.setItem(PWA_INSTALLED_KEY, 'true');
+      } catch (e) {
+        console.log('Could not save install state:', e);
+      }
     };
 
     // Listen for display mode changes
-    const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleDisplayModeChange = (e: MediaQueryListEvent) => {
-      setIsInstalled(e.matches);
+    const standaloneMediaQuery = window.matchMedia('(display-mode: standalone)');
+    const handleDisplayModeChange = () => {
+      const newState = determineInstallationState();
+      setIsInstalled(newState);
     };
 
+    // Event listeners
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
     window.addEventListener('appinstalled', handleAppInstalled);
-    mediaQuery.addEventListener('change', handleDisplayModeChange);
+    standaloneMediaQuery.addEventListener('change', handleDisplayModeChange);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
       window.removeEventListener('appinstalled', handleAppInstalled);
-      mediaQuery.removeEventListener('change', handleDisplayModeChange);
+      standaloneMediaQuery.removeEventListener('change', handleDisplayModeChange);
     };
   }, []);
 
   const installApp = async (): Promise<void> => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      console.log('No install prompt available');
+      return;
+    }
 
     try {
-      // Show the install prompt
+      console.log('Showing install prompt...');
       await deferredPrompt.prompt();
 
-      // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
+      console.log('Install prompt result:', outcome);
 
       if (outcome === 'accepted') {
-        console.log('User accepted the install prompt');
+        console.log('User accepted installation');
         setIsInstalled(true);
+        // Save install state immediately
+        try {
+          localStorage.setItem(PWA_INSTALLED_KEY, 'true');
+        } catch (e) {
+          console.log('Could not save install state:', e);
+        }
       } else {
-        console.log('User dismissed the install prompt');
+        console.log('User dismissed installation');
       }
 
-      // Clear the saved prompt since it can only be used once
       setDeferredPrompt(null);
       setIsInstallable(false);
     } catch (error) {
-      console.error('Error showing install prompt:', error);
+      console.error('Error during installation:', error);
+    }
+  };
+
+  // Method to manually mark as installed (for iOS/manual installations)
+  const markAsInstalled = () => {
+    setIsInstalled(true);
+    try {
+      localStorage.setItem(PWA_INSTALLED_KEY, 'true');
+    } catch (e) {
+      console.log('Could not save install state:', e);
+    }
+  };
+
+  // Method to reset installation state (for testing)
+  const resetInstallState = () => {
+    setIsInstalled(false);
+    setIsInstallable(false);
+    setDeferredPrompt(null);
+    try {
+      localStorage.removeItem(PWA_INSTALLED_KEY);
+    } catch (e) {
+      console.log('Could not clear install state:', e);
     }
   };
 
@@ -95,9 +179,11 @@ export const usePWA = () => {
   };
 
   return {
-    isInstallable: true, // Always show the button
+    isInstallable,
     isInstalled,
     installStatus: getInstallStatus(),
-    installApp
+    installApp,
+    markAsInstalled, // For manual iOS installations
+    resetInstallState // For testing
   };
 };

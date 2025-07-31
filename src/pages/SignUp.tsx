@@ -95,11 +95,11 @@ const SignUp: React.FC = () => {
     <Box
       sx={{
         width: "100%",
-        maxWidth: { xs: 480, md: 1100 },
+        maxWidth: { xs: 400, md: 1100 }, // Smaller max width on mobile
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        px: 2,
+        px: { xs: 1.5, md: 2 }, // Reduced padding on mobile
       }}
     >
       {/* Main Container */}
@@ -108,9 +108,9 @@ const SignUp: React.FC = () => {
           width: "100%",
           backgroundColor: alpha(theme.palette.background.paper, 0.7),
           backdropFilter: "blur(20px)",
-          borderRadius: 2,
+          borderRadius: { xs: 1.5, md: 2 }, // Smaller border radius on mobile
           border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          boxShadow: `0 12px 40px ${alpha(theme.palette.common.black, 0.1)}`,
+          boxShadow: `0 ${isMobile ? '4px 16px' : '12px 40px'} ${alpha(theme.palette.common.black, isMobile ? 0.08 : 0.1)}`,
           overflow: "hidden",
           position: "relative",
           "&::before": {
@@ -119,7 +119,7 @@ const SignUp: React.FC = () => {
             top: 0,
             left: 0,
             right: 0,
-            height: 4,
+            height: { xs: 2, md: 4 }, // Thinner top border on mobile
             background: `linear-gradient(90deg, ${theme.palette.success.main} 0%, ${theme.palette.primary.main} 50%, ${theme.palette.secondary.main} 100%)`,
           },
         }}
@@ -144,10 +144,10 @@ const SignUp: React.FC = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              p: { xs: 3, md: 6 },
+              p: { xs: 1.5, md: 6 }, // Much smaller padding on mobile
               textAlign: "center",
               position: "relative",
-              minHeight: { xs: "200px", md: "700px" },
+              minHeight: { xs: "120px", md: "700px" }, // Reduced height on mobile
               flex: { xs: "1 1 100%", md: "1 1 41.666667%" }, // Explicit flex for 5/12 width
               maxWidth: { xs: "100%", md: "41.666667%" },
               "&::before": {
@@ -167,15 +167,15 @@ const SignUp: React.FC = () => {
             {/* Logo */}
             <Box
               sx={{
-                width: { xs: 50, md: 100 },
-                height: { xs: 50, md: 100 },
-                borderRadius: { xs: 2, md: 4 },
+                width: { xs: 28, md: 100 }, // Much smaller logo on mobile
+                height: { xs: 28, md: 100 },
+                borderRadius: { xs: 1, md: 4 },
                 background: `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                mb: { xs: 1.5, md: 4 },
-                boxShadow: `0 12px 40px ${alpha(theme.palette.success.main, 0.4)}`,
+                mb: { xs: 0.5, md: 4 }, // Reduced margin on mobile
+                boxShadow: `0 ${isMobile ? '2px 8px' : '12px 40px'} ${alpha(theme.palette.success.main, 0.4)}`,
                 animation: !isMobile ? "pulse 3s ease-in-out infinite alternate" : "none",
                 "@keyframes pulse": {
                   "0%": {
@@ -189,12 +189,12 @@ const SignUp: React.FC = () => {
                 },
               }}
             >
-              <AccountBalanceIcon sx={{ fontSize: { xs: 24, md: 50 }, color: "white" }} />
+              <AccountBalanceIcon sx={{ fontSize: { xs: 16, md: 50 }, color: "white" }} />
             </Box>
 
             {/* Welcome Text */}
             <Typography
-              variant={isMobile ? "h6" : "h3"}
+              variant={isMobile ? "subtitle1" : "h3"}
               sx={{
                 fontWeight: 700,
                 background: `linear-gradient(45deg, ${theme.palette.success.main} 30%, ${theme.palette.success.dark} 90%)`,
@@ -202,20 +202,20 @@ const SignUp: React.FC = () => {
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 lineHeight: 1.2,
-                mb: { xs: 1, md: 3 },
-                fontSize: { xs: "1.2rem", sm: "1.5rem", md: "3rem" },
+                mb: { xs: 0.25, md: 3 }, // Reduced margin on mobile
+                fontSize: { xs: "0.9rem", sm: "1.1rem", md: "3rem" }, // Smaller font on mobile
               }}
             >
               Join BudgetTracker
             </Typography>
 
             <Typography
-              variant={isMobile ? "body2" : "h5"}
+              variant={isMobile ? "caption" : "h5"}
               sx={{
                 color: theme.palette.text.secondary,
                 fontWeight: 400,
-                mb: { xs: 1, md: 2 },
-                fontSize: { xs: "0.875rem", md: "1.5rem" },
+                mb: { xs: 0, md: 2 },
+                fontSize: { xs: "0.7rem", md: "1.5rem" }, // Much smaller font on mobile
               }}
             >
               Start your financial journey
@@ -279,7 +279,8 @@ const SignUp: React.FC = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              p: { xs: 3, md: 6 },
+
+              p: { xs: 1.5, md: 6 }, // Much smaller padding on mobile
               minHeight: { xs: "auto", md: "700px" },
               flex: { xs: "1 1 100%", md: "1 1 58.333333%" }, // Explicit flex for 7/12 width
               maxWidth: { xs: "100%", md: "58.333333%" },
@@ -288,7 +289,7 @@ const SignUp: React.FC = () => {
             <Box
               sx={{
                 width: "100%",
-                maxWidth: "450px",
+                maxWidth: { xs: "280px", md: "450px" }, // Smaller max width on mobile
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
@@ -299,12 +300,15 @@ const SignUp: React.FC = () => {
                 <Alert
                   severity="error"
                   sx={{
-                    mb: 4,
+                    mb: { xs: 2, md: 4 }, // Smaller margin on mobile
                     width: "100%",
-                    borderRadius: 3,
+                    borderRadius: 1.5,
                     backgroundColor: alpha(theme.palette.error.main, 0.1),
                     border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-                    fontSize: "1rem",
+                    fontSize: { xs: "0.8rem", md: "1rem" }, // Smaller font on mobile
+                    "& .MuiAlert-icon": {
+                      fontSize: { xs: "1rem", md: "1.2rem" }, // Smaller icon on mobile
+                    },
                   }}
                 >
                   {error}
@@ -312,43 +316,44 @@ const SignUp: React.FC = () => {
               )}
 
               {/* Form */}
-              <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
-                <Stack spacing={3.5} sx={{ width: "100%" }}>
+              <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%', pt: 3 }}>
+                <Stack spacing={{ xs: 1.5, sm: 3.5 }} sx={{ width: '100%' }}> {/* Reduced spacing on mobile */}
                   {/* Name Fields Row */}
-                  <Box display="flex" gap={2}>
+                  <Box display="flex" gap={{ xs: 2 }} flexDirection={{ xs: 'column', sm: 'row' }}>
                     <TextField
                       label="First Name"
                       fullWidth
                       value={formData.firstname}
-                      onChange={handleChange("firstname")}
+                      onChange={handleChange('firstname')}
                       required
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <PersonIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                            <PersonIcon sx={{ color: theme.palette.success.main, fontSize: { xs: 14, sm: 20 } }} />
                           </InputAdornment>
                         ),
                       }}
                       sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1.5,
                           backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                          fontSize: "1rem",
-                          height: "48px",
-                          "&:hover": {
+                          fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller font on mobile
+                          height: { xs: 32, sm: 48 }, // Smaller height on mobile
+                          minHeight: { xs: 32, sm: 48 },
+                          '&:hover': {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                           },
-                          "&.Mui-focused": {
+                          '&.Mui-focused': {
                             backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                            "& .MuiOutlinedInput-notchedOutline": {
+                            '& .MuiOutlinedInput-notchedOutline': {
                               borderColor: theme.palette.success.main,
                               borderWidth: 2,
                             },
                           },
                         },
-                        "& .MuiInputLabel-root": {
-                          fontSize: "1rem",
-                          "&.Mui-focused": {
+                        '& .MuiInputLabel-root': {
+                          fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller label on mobile
+                          '&.Mui-focused': {
                             color: theme.palette.success.main,
                           },
                         },
@@ -358,35 +363,36 @@ const SignUp: React.FC = () => {
                       label="Last Name"
                       fullWidth
                       value={formData.lastname}
-                      onChange={handleChange("lastname")}
+                      onChange={handleChange('lastname')}
                       required
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
-                            <PersonIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                            <PersonIcon sx={{ color: theme.palette.success.main, fontSize: { xs: 14, sm: 20 } }} />
                           </InputAdornment>
                         ),
                       }}
                       sx={{
-                        "& .MuiOutlinedInput-root": {
-                          borderRadius: 2,
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 1.5,
                           backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                          fontSize: "1rem",
-                          height: "48px",
-                          "&:hover": {
+                          fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller font on mobile
+                          height: { xs: 32, sm: 48 }, // Smaller height on mobile
+                          minHeight: { xs: 32, sm: 48 },
+                          '&:hover': {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                           },
-                          "&.Mui-focused": {
+                          '&.Mui-focused': {
                             backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                            "& .MuiOutlinedInput-notchedOutline": {
+                            '& .MuiOutlinedInput-notchedOutline': {
                               borderColor: theme.palette.success.main,
                               borderWidth: 2,
                             },
                           },
                         },
-                        "& .MuiInputLabel-root": {
-                          fontSize: "1rem",
-                          "&.Mui-focused": {
+                        '& .MuiInputLabel-root': {
+                          fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller label on mobile
+                          '&.Mui-focused': {
                             color: theme.palette.success.main,
                           },
                         },
@@ -399,35 +405,36 @@ const SignUp: React.FC = () => {
                     type="email"
                     fullWidth
                     value={formData.email}
-                    onChange={handleChange("email")}
+                    onChange={handleChange('email')}
                     required
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <EmailIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                          <EmailIcon sx={{ color: theme.palette.success.main, fontSize: { xs: 14, sm: 20 } }} />
                         </InputAdornment>
                       ),
                     }}
                     sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 1.5,
                         backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                        fontSize: "1rem",
-                        height: "48px",
-                        "&:hover": {
+                        fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller font on mobile
+                        height: { xs: 32, sm: 48 }, // Smaller height on mobile
+                        minHeight: { xs: 32, sm: 48 },
+                        '&:hover': {
                           backgroundColor: alpha(theme.palette.background.paper, 0.8),
                         },
-                        "&.Mui-focused": {
+                        '&.Mui-focused': {
                           backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                          "& .MuiOutlinedInput-notchedOutline": {
+                          '& .MuiOutlinedInput-notchedOutline': {
                             borderColor: theme.palette.success.main,
                             borderWidth: 2,
                           },
                         },
                       },
-                      "& .MuiInputLabel-root": {
-                        fontSize: "1rem",
-                        "&.Mui-focused": {
+                      '& .MuiInputLabel-root': {
+                        fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller label on mobile
+                        '&.Mui-focused': {
                           color: theme.palette.success.main,
                         },
                       },
@@ -436,49 +443,54 @@ const SignUp: React.FC = () => {
 
                   <TextField
                     label="Password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     fullWidth
                     value={formData.password}
-                    onChange={handleChange("password")}
+                    onChange={handleChange('password')}
                     required
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <LockIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                          <LockIcon sx={{ color: theme.palette.success.main, fontSize: { xs: 14, sm: 20 } }} />
                         </InputAdornment>
                       ),
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            size={isMobile ? "small" : "medium"} // Smaller button on mobile
+                          >
                             {showPassword ? (
-                              <VisibilityOff sx={{ fontSize: 20 }} />
+                              <VisibilityOff sx={{ fontSize: { xs: 14, sm: 20 } }} />
                             ) : (
-                              <Visibility sx={{ fontSize: 20 }} />
+                              <Visibility sx={{ fontSize: { xs: 14, sm: 20 } }} />
                             )}
                           </IconButton>
                         </InputAdornment>
                       ),
                     }}
                     sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 1.5,
                         backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                        fontSize: "1rem",
-                        height: "48px",
-                        "&:hover": {
+                        fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller font on mobile
+                        height: { xs: 32, sm: 48 }, // Smaller height on mobile
+                        minHeight: { xs: 32, sm: 48 },
+                        '&:hover': {
                           backgroundColor: alpha(theme.palette.background.paper, 0.8),
                         },
-                        "&.Mui-focused": {
+                        '&.Mui-focused': {
                           backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                          "& .MuiOutlinedInput-notchedOutline": {
+                          '& .MuiOutlinedInput-notchedOutline': {
                             borderColor: theme.palette.success.main,
                             borderWidth: 2,
                           },
                         },
                       },
-                      "& .MuiInputLabel-root": {
-                        fontSize: "1rem",
-                        "&.Mui-focused": {
+                      '& .MuiInputLabel-root': {
+                        fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller label on mobile
+                        '&.Mui-focused': {
                           color: theme.palette.success.main,
                         },
                       },
@@ -487,49 +499,54 @@ const SignUp: React.FC = () => {
 
                   <TextField
                     label="Confirm Password"
-                    type={showConfirmPassword ? "text" : "password"}
+                    type={showConfirmPassword ? 'text' : 'password'}
                     fullWidth
                     value={formData.confirmPassword}
-                    onChange={handleChange("confirmPassword")}
+                    onChange={handleChange('confirmPassword')}
                     required
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <LockIcon sx={{ color: theme.palette.success.main, fontSize: 20 }} />
+                          <LockIcon sx={{ color: theme.palette.success.main, fontSize: { xs: 14, sm: 20 } }} />
                         </InputAdornment>
                       ),
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
+                          <IconButton
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                            size={isMobile ? "small" : "medium"} // Smaller button on mobile
+                          >
                             {showConfirmPassword ? (
-                              <VisibilityOff sx={{ fontSize: 20 }} />
+                              <VisibilityOff sx={{ fontSize: { xs: 14, sm: 20 } }} />
                             ) : (
-                              <Visibility sx={{ fontSize: 20 }} />
+                              <Visibility sx={{ fontSize: { xs: 14, sm: 20 } }} />
                             )}
                           </IconButton>
                         </InputAdornment>
                       ),
                     }}
                     sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 2,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 1.5,
                         backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                        fontSize: "1rem",
-                        height: "48px",
-                        "&:hover": {
+                        fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller font on mobile
+                        height: { xs: 32, sm: 48 }, // Smaller height on mobile
+                        minHeight: { xs: 32, sm: 48 },
+                        '&:hover': {
                           backgroundColor: alpha(theme.palette.background.paper, 0.8),
                         },
-                        "&.Mui-focused": {
+                        '&.Mui-focused': {
                           backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                          "& .MuiOutlinedInput-notchedOutline": {
+                          '& .MuiOutlinedInput-notchedOutline': {
                             borderColor: theme.palette.success.main,
                             borderWidth: 2,
                           },
                         },
                       },
-                      "& .MuiInputLabel-root": {
-                        fontSize: "1rem",
-                        "&.Mui-focused": {
+                      '& .MuiInputLabel-root': {
+                        fontSize: { xs: '0.8rem', sm: '1rem' }, // Smaller label on mobile
+                        '&.Mui-focused': {
                           color: theme.palette.success.main,
                         },
                       },
@@ -542,6 +559,7 @@ const SignUp: React.FC = () => {
                       <Checkbox
                         checked={acceptedTerms}
                         onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        size={isMobile ? "small" : "medium"} // Smaller checkbox on mobile
                         sx={{
                           color: theme.palette.success.main,
                           "&.Mui-checked": {
@@ -551,13 +569,20 @@ const SignUp: React.FC = () => {
                       />
                     }
                     label={
-                      <Typography variant="body1" sx={{ color: theme.palette.text.secondary, fontSize: "1rem" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: theme.palette.text.secondary,
+                          fontSize: { xs: "0.75rem", md: "1rem" } // Smaller font on mobile
+                        }}
+                      >
                         I agree to the{" "}
                         <Link
                           href="#"
                           sx={{
                             color: theme.palette.success.main,
                             textDecoration: "none",
+                            fontSize: { xs: "0.75rem", md: "1rem" }, // Smaller font on mobile
                             "&:hover": { textDecoration: "underline" },
                           }}
                         >
@@ -569,6 +594,7 @@ const SignUp: React.FC = () => {
                           sx={{
                             color: theme.palette.success.main,
                             textDecoration: "none",
+                            fontSize: { xs: "0.75rem", md: "1rem" }, // Smaller font on mobile
                             "&:hover": { textDecoration: "underline" },
                           }}
                         >
@@ -576,7 +602,7 @@ const SignUp: React.FC = () => {
                         </Link>
                       </Typography>
                     }
-                    sx={{ mt: 1, mb: 1 }}
+                    sx={{ mt: { xs: 0.5, md: 1 }, mb: { xs: 0.5, md: 1 } }} // Smaller margins on mobile
                   />
 
                   <Button
@@ -585,25 +611,26 @@ const SignUp: React.FC = () => {
                     fullWidth
                     disabled={loading}
                     sx={{
-                      py: 1.5,
-                      fontSize: "1.1rem",
+                      py: { xs: 0.8, md: 1.5 }, // Smaller padding on mobile
+                      fontSize: { xs: "0.85rem", md: "1.1rem" }, // Smaller font on mobile
                       fontWeight: 600,
-                      borderRadius: 2,
+                      borderRadius: 1.5,
                       textTransform: "none",
                       backgroundColor: theme.palette.success.main,
-                      boxShadow: `0 6px 20px ${alpha(theme.palette.success.main, 0.3)}`,
+                      boxShadow: `0 ${isMobile ? '2px 8px' : '6px 20px'} ${alpha(theme.palette.success.main, 0.3)}`,
                       "&:hover": {
                         backgroundColor: theme.palette.success.dark,
-                        transform: "translateY(-2px)",
-                        boxShadow: `0 8px 25px ${alpha(theme.palette.success.main, 0.4)}`,
+                        transform: isMobile ? "none" : "translateY(-2px)",
+                        boxShadow: `0 ${isMobile ? '3px 12px' : '8px 25px'} ${alpha(theme.palette.success.main, 0.4)}`,
                       },
                       "&:disabled": {
                         backgroundColor: alpha(theme.palette.success.main, 0.6),
                       },
                       transition: "all 0.3s ease-in-out",
+                      minHeight: { xs: "32px", md: "48px" }, // Smaller button height on mobile
                     }}
                   >
-                    {loading ? <CircularProgress size={24} color="inherit" /> : "Create Budget Account"}
+                    {loading ? <CircularProgress size={isMobile ? 16 : 24} color="inherit" /> : "Create Budget Account"}
                   </Button>
 
                   {/* <Divider
@@ -658,23 +685,29 @@ const SignUp: React.FC = () => {
               <Box
                 sx={{
                   textAlign: "center",
-                  mt: 4,
-                  pt: 3,
+                  mt: { xs: 2, md: 4 }, // Smaller margin on mobile
+                  pt: { xs: 1.5, md: 3 }, // Smaller padding on mobile
                   borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                   width: "100%",
                 }}
               >
-                <Typography variant="body1" sx={{ color: theme.palette.text.secondary, fontSize: "1rem" }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    fontSize: { xs: "0.75rem", md: "1rem" } // Smaller font on mobile
+                  }}
+                >
                   Already have an account?{" "}
                   <Link
                     component="button"
-                    variant="body1"
+                    variant="body2"
                     onClick={() => navigate("/signin")}
                     sx={{
                       color: theme.palette.success.main,
                       textDecoration: "none",
                       fontWeight: 600,
-                      fontSize: "1rem",
+                      fontSize: { xs: "0.75rem", md: "1rem" }, // Smaller font on mobile
                       "&:hover": {
                         textDecoration: "underline",
                         color: theme.palette.success.dark,

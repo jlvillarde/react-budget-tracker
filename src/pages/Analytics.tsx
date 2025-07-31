@@ -15,7 +15,7 @@ import {
     Divider,
     CircularProgress,
     Paper,
-    Button,
+    // Button,
     IconButton,
     Tooltip,
     Tab,
@@ -30,7 +30,7 @@ import {
     ShowChart as LineChartIcon,
     CalendarViewMonth as CalendarIcon,
     Info as InfoIcon,
-    Download as DownloadIcon,
+    // Download as DownloadIcon,
     TrendingUp as TrendingUpIcon,
     TrendingDown as TrendingDownIcon,
     Lightbulb as LightbulbIcon,
@@ -426,7 +426,7 @@ const Analytics: React.FC = () => {
                     </Select>
                 </FormControl>
 
-                <Button
+                {/* <Button
                     variant="outlined"
                     startIcon={<DownloadIcon />}
                     size={isMobile ? "small" : "medium"}
@@ -442,11 +442,11 @@ const Analytics: React.FC = () => {
                     onClick={() => alert("Export functionality would be implemented here")}
                 >
                     Export Report
-                </Button>
+                </Button> */}
             </Box>
 
             {/* Summary Cards */}
-            <Grid container spacing={isMobile ? 1 : 3} sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
+            <Grid container spacing={isMobile ? 1 : 3} sx={{ mb: { xs: 2, sm: 3, md: 4 }, py: { xs: 3 } }}>
                 <Grid size={{ xs: 6, md: 3 }}>
                     <Card
                         elevation={0}
@@ -744,27 +744,24 @@ const Analytics: React.FC = () => {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                             backdropFilter: "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            p: {
-                                xs: 1,
-                                sm: 2
-                            }
+                            p: { xs: 1, sm: 2 }
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
-                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 1, sm: 2 }, px: 1 }}>
+                            <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 600, fontSize: isMobile ? '1.05rem' : undefined }}>
                                 Expense Distribution by Category
                             </Typography>
                             <Tooltip title="Shows how your spending is distributed across different categories">
                                 <IconButton size="small">
-                                    <InfoIcon />
+                                    <InfoIcon fontSize={isMobile ? "small" : "medium"} />
                                 </IconButton>
                             </Tooltip>
                         </Box>
 
-                        <Grid container spacing={3}>
+                        <Grid container spacing={isMobile ? 1.5 : 3} direction={isMobile ? 'column' : 'row'}>
                             <Grid size={{ xs: 12, md: 8 }}>
                                 {expensesByCategory.length > 0 ? (
-                                    <Box sx={{ height: { xs: 300, sm: 350, md: 400 } }}>
+                                    <Box sx={{ height: { xs: 200, sm: 350, md: 400 }, mb: isMobile ? 2 : 0 }}>
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
                                                 <Pie
@@ -772,7 +769,7 @@ const Analytics: React.FC = () => {
                                                     cx="50%"
                                                     cy="50%"
                                                     labelLine={false}
-                                                    outerRadius={isMobile ? 80 : 150}
+                                                    outerRadius={isMobile ? 70 : 150}
                                                     fill="#8884d8"
                                                     dataKey="value"
                                                     label={isMobile ? false : (props) =>
@@ -785,14 +782,14 @@ const Analytics: React.FC = () => {
                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                     ))}
                                                 </Pie>
-                                                <RechartsTooltip formatter={(value: number) => `₱${value}`} />
+                                                <RechartsTooltip formatter={(value: number) => `₱${value}`} contentStyle={{ fontSize: isMobile ? 11 : 14 }} />
                                                 {!isMobile && <Legend />}
                                             </PieChart>
                                         </ResponsiveContainer>
                                     </Box>
                                 ) : (
-                                    <Box sx={{ height: { xs: 300, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                    <Box sx={{ height: { xs: 200, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Typography variant={isMobile ? "body2" : "h6"} sx={{ color: theme.palette.text.secondary, fontSize: isMobile ? '0.95rem' : { xs: '1rem', md: '1.25rem' } }}>
                                             No expense data available
                                         </Typography>
                                     </Box>
@@ -803,23 +800,24 @@ const Analytics: React.FC = () => {
                                 <Paper
                                     elevation={0}
                                     sx={{
-                                        p: 2,
+                                        p: isMobile ? 1.5 : 2,
                                         backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                                        height: '100%'
+                                        height: isMobile ? 'auto' : '100%',
+                                        mt: isMobile ? 2 : 0
                                     }}
                                 >
-                                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                    <Typography variant={isMobile ? "body1" : "h6"} sx={{ mb: 2, fontWeight: 600, fontSize: isMobile ? '1rem' : undefined }}>
                                         Top Categories
                                     </Typography>
 
-                                    <Stack spacing={2}>
+                                    <Stack spacing={isMobile ? 1.2 : 2}>
                                         {topCategories.map((category, index) => (
                                             <Box key={index}>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: isMobile ? '0.95rem' : undefined }}>
                                                         {category.name}
                                                     </Typography>
-                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: isMobile ? '0.95rem' : undefined }}>
                                                         ₱{category.value.toFixed(2)}
                                                     </Typography>
                                                 </Box>
@@ -839,9 +837,9 @@ const Analytics: React.FC = () => {
                                     </Stack>
 
                                     {expensesByCategory.length > 5 && (
-                                        <Box sx={{ mt: 3 }}>
-                                            <Divider sx={{ mb: 2 }} />
-                                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                                        <Box sx={{ mt: 2 }}>
+                                            <Divider sx={{ mb: 1.5 }} />
+                                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontSize: isMobile ? '0.9rem' : undefined }}>
                                                 {expensesByCategory.length - 5} more categories not shown
                                             </Typography>
                                         </Box>
@@ -856,64 +854,80 @@ const Analytics: React.FC = () => {
                     <Card
                         elevation={0}
                         sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                            backdropFilter: "blur(10px)",
+                            backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                            backdropFilter: isMobile ? undefined : "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                             p: {
-                                xs: 1,
+                                xs: 1.5,
                                 sm: 2
-                            }
+                            },
+                            borderRadius: { xs: 2, sm: 3 },
+                            boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.04)' : undefined,
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
-                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        <Box sx={{
+                            display: "flex",
+                            flexDirection: isMobile ? "column" : "row",
+                            justifyContent: "space-between",
+                            alignItems: isMobile ? "flex-start" : "center",
+                            mb: isMobile ? 1 : 2,
+                            px: isMobile ? 0 : 1
+                        }}>
+                            <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 700, fontSize: isMobile ? '1.1rem' : undefined }}>
                                 Monthly Expense Trends
                             </Typography>
                             <Tooltip title="Shows your expense trends over the past 6 months">
-                                <IconButton size="small">
-                                    <InfoIcon />
+                                <IconButton size="small" sx={{ mt: isMobile ? 0.5 : 0 }}>
+                                    <InfoIcon fontSize={isMobile ? "small" : "medium"} />
                                 </IconButton>
                             </Tooltip>
                         </Box>
 
                         {monthlyExpenseData.length > 0 ? (
-                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 } }}>
+                            <Box sx={{
+                                height: { xs: 220, sm: 350, md: 400 },
+                                pb: isMobile ? 1 : 0,
+                                mx: isMobile ? -1.5 : 0
+                            }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={monthlyExpenseData}
-                                        margin={{ 
-                                            top: 20, 
-                                            right: isMobile ? 10 : 30, 
-                                            left: isMobile ? 10 : 20, 
-                                            bottom: 5 
+                                        margin={{
+                                            top: isMobile ? 10 : 20,
+                                            right: isMobile ? 2 : 30,
+                                            left: isMobile ? 2 : 20,
+                                            bottom: isMobile ? 0 : 5
                                         }}
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.25)} />
                                         <XAxis
                                             dataKey="month"
-                                            tick={{ 
-                                                fill: theme.palette.text.secondary, 
-                                                fontSize: isMobile ? 10 : 12 
+                                            tick={{
+                                                fill: theme.palette.text.secondary,
+                                                fontSize: isMobile ? 9 : 12,
+                                                fontWeight: 500
                                             }}
-                                            angle={isMobile ? -45 : 0}
+                                            angle={isMobile ? -35 : 0}
                                             textAnchor={isMobile ? 'end' : 'middle'}
-                                            height={isMobile ? 60 : 30}
+                                            height={isMobile ? 38 : 30}
+                                            interval={0}
                                         />
                                         <YAxis
-                                            tick={{ 
-                                                fill: theme.palette.text.secondary, 
-                                                fontSize: isMobile ? 10 : 12 
+                                            tick={{
+                                                fill: theme.palette.text.secondary,
+                                                fontSize: isMobile ? 9 : 12
                                             }}
-                                            tickFormatter={(value) => isMobile ? `₱${(value/1000).toFixed(0)}k` : `₱${value}`}
-                                            width={isMobile ? 40 : 60}
+                                            tickFormatter={(value) => isMobile ? `₱${(value / 1000).toFixed(0)}k` : `₱${value}`}
+                                            width={isMobile ? 32 : 60}
                                         />
                                         <RechartsTooltip
                                             formatter={(value) => `₱${value}`}
                                             contentStyle={{
-                                                backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                                                backgroundColor: alpha(theme.palette.background.paper, 0.97),
                                                 border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
                                                 borderRadius: 8,
-                                                fontSize: isMobile ? 12 : 14,
+                                                fontSize: isMobile ? 11 : 14,
+                                                boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.08)' : undefined,
                                             }}
                                         />
                                         {!isMobile && <Legend />}
@@ -921,14 +935,15 @@ const Analytics: React.FC = () => {
                                             dataKey="amount"
                                             name="Total Expenses"
                                             fill={theme.palette.primary.main}
-                                            radius={[4, 4, 0, 0]}
+                                            radius={isMobile ? [3, 3, 0, 0] : [4, 4, 0, 0]}
+                                            barSize={isMobile ? 18 : undefined}
                                         />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </Box>
                         ) : (
-                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                            <Box sx={{ height: { xs: 220, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center', px: isMobile ? 1 : 0 }}>
+                                <Typography variant={isMobile ? "body2" : "h6"} sx={{ color: theme.palette.text.secondary, fontSize: { xs: '0.95rem', md: '1.25rem' }, textAlign: 'center' }}>
                                     No expense data available
                                 </Typography>
                             </Box>
@@ -940,61 +955,80 @@ const Analytics: React.FC = () => {
                     <Card
                         elevation={0}
                         sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                            backdropFilter: "blur(10px)",
+                            backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                            backdropFilter: isMobile ? undefined : "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                             p: {
-                                xs: 1,
+                                xs: 1.5,
                                 sm: 2
-                            }
+                            },
+                            borderRadius: { xs: 2, sm: 3 },
+                            boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.04)' : undefined,
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
-                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        <Box sx={{
+                            display: "flex",
+                            flexDirection: isMobile ? "column" : "row",
+                            justifyContent: "space-between",
+                            alignItems: isMobile ? "flex-start" : "center",
+                            mb: isMobile ? 1 : 2,
+                            px: isMobile ? 0 : 1
+                        }}>
+                            <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 700, fontSize: isMobile ? '1.1rem' : undefined }}>
                                 Daily Spending Patterns
                             </Typography>
                             <Tooltip title="Shows your daily spending patterns over the past 14 days">
-                                <IconButton size="small">
-                                    <InfoIcon />
+                                <IconButton size="small" sx={{ mt: isMobile ? 0.5 : 0 }}>
+                                    <InfoIcon fontSize={isMobile ? "small" : "medium"} />
                                 </IconButton>
                             </Tooltip>
                         </Box>
 
                         {dailyExpenseData.length > 0 ? (
-                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 } }}>
+                            <Box sx={{
+                                height: { xs: 220, sm: 350, md: 400 },
+                                pb: isMobile ? 1 : 0,
+                                mx: isMobile ? -1.5 : 0
+                            }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart
                                         data={dailyExpenseData}
-                                        margin={{ 
-                                            top: 20, 
-                                            right: isMobile ? 10 : 30, 
-                                            left: isMobile ? 10 : 20, 
-                                            bottom: 5 
+                                        margin={{
+                                            top: isMobile ? 10 : 20,
+                                            right: isMobile ? 2 : 30,
+                                            left: isMobile ? 2 : 20,
+                                            bottom: isMobile ? 0 : 5
                                         }}
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.25)} />
                                         <XAxis
                                             dataKey="date"
-                                            tick={{ 
-                                                fill: theme.palette.text.secondary, 
-                                                fontSize: isMobile ? 10 : 12 
+                                            tick={{
+                                                fill: theme.palette.text.secondary,
+                                                fontSize: isMobile ? 9 : 12,
+                                                fontWeight: 500
                                             }}
+                                            angle={isMobile ? -35 : 0}
+                                            textAnchor={isMobile ? 'end' : 'middle'}
+                                            height={isMobile ? 38 : 30}
+                                            interval={0}
                                         />
                                         <YAxis
-                                            tick={{ 
-                                                fill: theme.palette.text.secondary, 
-                                                fontSize: isMobile ? 10 : 12 
+                                            tick={{
+                                                fill: theme.palette.text.secondary,
+                                                fontSize: isMobile ? 9 : 12
                                             }}
-                                            tickFormatter={(value) => isMobile ? `₱${(value/1000).toFixed(0)}k` : `₱${value}`}
-                                            width={isMobile ? 40 : 60}
+                                            tickFormatter={(value) => isMobile ? `₱${(value / 1000).toFixed(0)}k` : `₱${value}`}
+                                            width={isMobile ? 32 : 60}
                                         />
                                         <RechartsTooltip
                                             formatter={(value) => `₱${value}`}
                                             contentStyle={{
-                                                backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                                                backgroundColor: alpha(theme.palette.background.paper, 0.97),
                                                 border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
                                                 borderRadius: 8,
-                                                fontSize: isMobile ? 12 : 14,
+                                                fontSize: isMobile ? 11 : 14,
+                                                boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.08)' : undefined,
                                             }}
                                         />
                                         {!isMobile && <Legend />}
@@ -1011,8 +1045,8 @@ const Analytics: React.FC = () => {
                                 </ResponsiveContainer>
                             </Box>
                         ) : (
-                            <Box sx={{ height: { xs: 300, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary, fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                            <Box sx={{ height: { xs: 220, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center', px: isMobile ? 1 : 0 }}>
+                                <Typography variant={isMobile ? "body2" : "h6"} sx={{ color: theme.palette.text.secondary, fontSize: { xs: '0.95rem', md: '1.25rem' }, textAlign: 'center' }}>
                                     No expense data available
                                 </Typography>
                             </Box>
@@ -1024,64 +1058,87 @@ const Analytics: React.FC = () => {
                     <Card
                         elevation={0}
                         sx={{
-                            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                            backdropFilter: "blur(10px)",
+                            backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                            backdropFilter: isMobile ? undefined : "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                             p: {
-                                xs: 1,
+                                xs: 1.5,
                                 sm: 2
-                            }
+                            },
+                            borderRadius: { xs: 2, sm: 3 },
+                            boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.04)' : undefined,
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, px: 1 }}>
-                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        <Box sx={{
+                            display: "flex",
+                            flexDirection: isMobile ? "column" : "row",
+                            justifyContent: "space-between",
+                            alignItems: isMobile ? "flex-start" : "center",
+                            mb: isMobile ? 1 : 2,
+                            px: isMobile ? 0 : 1
+                        }}>
+                            <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 700, fontSize: isMobile ? '1.1rem' : undefined }}>
                                 Spending by Day of Week
                             </Typography>
                             <Tooltip title="Shows your spending patterns by day of the week">
-                                <IconButton size="small">
-                                    <InfoIcon />
+                                <IconButton size="small" sx={{ mt: isMobile ? 0.5 : 0 }}>
+                                    <InfoIcon fontSize={isMobile ? "small" : "medium"} />
                                 </IconButton>
                             </Tooltip>
                         </Box>
 
                         {spendingByDayOfWeek.some(day => day.total > 0) ? (
-                            <Grid container spacing={3}>
+                            <Grid container spacing={isMobile ? 1.5 : 3} direction={isMobile ? 'column' : 'row'}>
                                 <Grid size={{ xs: 12, md: 8 }}>
-                                    <Box sx={{ height: 400 }}>
+                                    <Box sx={{ height: { xs: 220, sm: 350, md: 400 }, mx: isMobile ? -1.5 : 0 }}>
                                         <ResponsiveContainer width="100%" height="100%">
                                             <BarChart
                                                 data={spendingByDayOfWeek}
-                                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                                margin={{
+                                                    top: isMobile ? 10 : 20,
+                                                    right: isMobile ? 2 : 30,
+                                                    left: isMobile ? 2 : 20,
+                                                    bottom: isMobile ? 0 : 5
+                                                }}
                                             >
-                                                <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.25)} />
                                                 <XAxis
                                                     dataKey="name"
-                                                    tick={{ fill: theme.palette.text.secondary }}
+                                                    tick={{ fill: theme.palette.text.secondary, fontSize: isMobile ? 9 : 12, fontWeight: 500 }}
+                                                    angle={isMobile ? -35 : 0}
+                                                    textAnchor={isMobile ? 'end' : 'middle'}
+                                                    height={isMobile ? 38 : 30}
+                                                    interval={0}
                                                 />
                                                 <YAxis
-                                                    tickFormatter={(value) => `₱${value}`}
-                                                    tick={{ fill: theme.palette.text.secondary }}
+                                                    tickFormatter={(value) => isMobile ? `₱${(value / 1000).toFixed(0)}k` : `₱${value}`}
+                                                    tick={{ fill: theme.palette.text.secondary, fontSize: isMobile ? 9 : 12 }}
+                                                    width={isMobile ? 32 : 60}
                                                 />
                                                 <RechartsTooltip
                                                     formatter={(value: number) => `₱${value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                     contentStyle={{
-                                                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                                                        backgroundColor: alpha(theme.palette.background.paper, 0.97),
                                                         border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
                                                         borderRadius: 8,
+                                                        fontSize: isMobile ? 11 : 14,
+                                                        boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.08)' : undefined,
                                                     }}
                                                 />
-                                                <Legend />
+                                                {!isMobile && <Legend />}
                                                 <Bar
                                                     dataKey="total"
                                                     name="Total Spent"
                                                     fill={theme.palette.warning.main}
-                                                    radius={[4, 4, 0, 0]}
+                                                    radius={isMobile ? [3, 3, 0, 0] : [4, 4, 0, 0]}
+                                                    barSize={isMobile ? 18 : undefined}
                                                 />
                                                 <Bar
                                                     dataKey="average"
                                                     name="Average per Transaction"
                                                     fill={theme.palette.info.main}
-                                                    radius={[4, 4, 0, 0]}
+                                                    radius={isMobile ? [3, 3, 0, 0] : [4, 4, 0, 0]}
+                                                    barSize={isMobile ? 18 : undefined}
                                                 />
                                             </BarChart>
                                         </ResponsiveContainer>
@@ -1091,12 +1148,13 @@ const Analytics: React.FC = () => {
                                     <Paper
                                         elevation={0}
                                         sx={{
-                                            p: 2,
+                                            p: isMobile ? 1.5 : 2,
                                             backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                                            height: '100%'
+                                            height: isMobile ? 'auto' : '100%',
+                                            mt: isMobile ? 2 : 0
                                         }}
                                     >
-                                        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                        <Typography variant={isMobile ? "body1" : "h6"} sx={{ mb: 2, fontWeight: 600, fontSize: isMobile ? '1rem' : undefined }}>
                                             Day of Week Insights
                                         </Typography>
 
@@ -1143,8 +1201,8 @@ const Analytics: React.FC = () => {
                                 </Grid>
                             </Grid>
                         ) : (
-                            <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                            <Box sx={{ height: { xs: 220, sm: 350, md: 400 }, display: 'flex', alignItems: 'center', justifyContent: 'center', px: isMobile ? 1 : 0 }}>
+                                <Typography variant={isMobile ? "body2" : "h6"} sx={{ color: theme.palette.text.secondary, fontSize: { xs: '0.95rem', md: '1.25rem' }, textAlign: 'center' }}>
                                     No expense data available for day-of-week analysis
                                 </Typography>
                             </Box>
@@ -1336,36 +1394,41 @@ const Analytics: React.FC = () => {
                             backgroundColor: alpha(theme.palette.background.paper, 0.8),
                             backdropFilter: "blur(10px)",
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                            p: 2,
+                            p: { xs: 1, sm: 2 },
                             mt: 2
                         }}
                     >
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                            <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 1, sm: 2 } }}>
+                            <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 600, fontSize: isMobile ? '1.05rem' : undefined }}>
                                 Spending by Day of Week
                             </Typography>
                             <Tooltip title="Shows your spending patterns by day of the week">
                                 <IconButton size="small">
-                                    <InfoIcon />
+                                    <InfoIcon fontSize={isMobile ? "small" : "medium"} />
                                 </IconButton>
                             </Tooltip>
                         </Box>
 
                         {spendingByDayOfWeek.some(day => day.total > 0) ? (
-                            <Box sx={{ height: 300, mt: 2 }}>
+                            <Box sx={{ height: { xs: 200, sm: 300 }, mt: { xs: 1, sm: 2 } }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={spendingByDayOfWeek}
-                                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                        margin={{ top: isMobile ? 5 : 10, right: isMobile ? 5 : 30, left: isMobile ? 5 : 20, bottom: isMobile ? 0 : 5 }}
                                     >
                                         <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
                                         <XAxis
                                             dataKey="name"
-                                            tick={{ fill: theme.palette.text.secondary }}
+                                            tick={{ fill: theme.palette.text.secondary, fontSize: isMobile ? 10 : 12, fontWeight: 500 }}
+                                            angle={isMobile ? -35 : 0}
+                                            textAnchor={isMobile ? 'end' : 'middle'}
+                                            height={isMobile ? 38 : 30}
+                                            interval={0}
                                         />
                                         <YAxis
-                                            tickFormatter={(value) => `₱${value}`}
-                                            tick={{ fill: theme.palette.text.secondary }}
+                                            tickFormatter={(value) => isMobile ? `₱${(value / 1000).toFixed(0)}k` : `₱${value}`}
+                                            tick={{ fill: theme.palette.text.secondary, fontSize: isMobile ? 10 : 12 }}
+                                            width={isMobile ? 32 : 60}
                                         />
                                         <RechartsTooltip
                                             formatter={(value: number) => `₱${value.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
@@ -1373,27 +1436,31 @@ const Analytics: React.FC = () => {
                                                 backgroundColor: alpha(theme.palette.background.paper, 0.9),
                                                 border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
                                                 borderRadius: 8,
+                                                fontSize: isMobile ? 11 : 14,
+                                                boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.08)' : undefined,
                                             }}
                                         />
-                                        <Legend />
+                                        {!isMobile && <Legend />}
                                         <Bar
                                             dataKey="total"
                                             name="Total Spent"
                                             fill={theme.palette.warning.main}
-                                            radius={[4, 4, 0, 0]}
+                                            radius={isMobile ? [3, 3, 0, 0] : [4, 4, 0, 0]}
+                                            barSize={isMobile ? 18 : undefined}
                                         />
                                         <Bar
                                             dataKey="average"
                                             name="Average per Transaction"
                                             fill={theme.palette.info.main}
-                                            radius={[4, 4, 0, 0]}
+                                            radius={isMobile ? [3, 3, 0, 0] : [4, 4, 0, 0]}
+                                            barSize={isMobile ? 18 : undefined}
                                         />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </Box>
                         ) : (
-                            <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                            <Box sx={{ height: { xs: 200, sm: 300 }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Typography variant={isMobile ? "body2" : "h6"} sx={{ color: theme.palette.text.secondary, fontSize: isMobile ? '0.95rem' : undefined }}>
                                     No expense data available for day-of-week analysis
                                 </Typography>
                             </Box>

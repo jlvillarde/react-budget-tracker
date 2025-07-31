@@ -238,10 +238,16 @@ const Expenses: React.FC = () => {
     // )
 
     // Filter and pagination logic
+    // ...existing code...
     const filteredExpenses = useMemo(() => {
-        return expenses.filter((expense) => {
+        // Sort by date descending (latest first)
+        const sorted = [...expenses].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        return sorted.filter((expense) => {
             const matchesCategory = !filterCategory || expense.category === filterCategory;
-            const matchesSearch = !searchTerm ||
+            const matchesSearch =
+                !searchTerm ||
                 expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 String(expense.amount).includes(searchTerm);
@@ -249,6 +255,7 @@ const Expenses: React.FC = () => {
             return matchesCategory && matchesSearch;
         });
     }, [expenses, filterCategory, searchTerm]);
+    // ...existing code...
 
     const paginatedExpenses = useMemo(() => {
         const startIndex = (page - 1) * itemsPerPage;
@@ -640,7 +647,13 @@ const Expenses: React.FC = () => {
                                         <ListItemText
                                             primary={
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                                    <Typography
+                                                        variant="h6"
+                                                        sx={{
+                                                            fontWeight: 600,
+                                                            fontSize: { xs: '0.95rem', sm: '1.25rem' } // Smaller on mobile
+                                                        }}
+                                                    >
                                                         {expense.description}
                                                     </Typography>
                                                     <Chip
@@ -653,13 +666,21 @@ const Expenses: React.FC = () => {
                                                             color: filterCategory === expense.category
                                                                 ? theme.palette.success.dark
                                                                 : theme.palette.primary.main,
+                                                            fontSize: { xs: '0.7rem', sm: '0.8125rem' }, // Smaller on mobile
+                                                            height: { xs: 22, sm: 24 } // Smaller height on mobile
                                                         }}
                                                     />
                                                 </Box>
                                             }
                                             secondary={
                                                 <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-                                                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{
+                                                            color: theme.palette.text.secondary,
+                                                            fontSize: { xs: '0.75rem', sm: '0.875rem' } // Smaller on mobile
+                                                        }}
+                                                    >
                                                         Date: {new Date(expense.date).toLocaleDateString()}
                                                     </Typography>
                                                     <Typography
@@ -667,6 +688,7 @@ const Expenses: React.FC = () => {
                                                         sx={{
                                                             fontWeight: 600,
                                                             color: theme.palette.success.main,
+                                                            fontSize: { xs: '0.9rem', sm: '1rem' } // Smaller on mobile
                                                         }}
                                                     >
                                                         ₱{Number(expense.amount).toFixed(2)}
@@ -674,33 +696,45 @@ const Expenses: React.FC = () => {
                                                 </Stack>
                                             }
                                         />
+
                                         <ListItemSecondaryAction>
                                             <IconButton
                                                 onClick={() => handleOpenDialog(expense)}
                                                 sx={{
                                                     mr: 1,
                                                     backgroundColor: alpha(theme.palette.primary.light, 0.1),
+                                                    width: { xs: 32, sm: 36 }, // Smaller on mobile
+                                                    height: { xs: 32, sm: 36 },
                                                     '&:hover': {
                                                         backgroundColor: alpha(theme.palette.primary.light, 0.2),
                                                     }
                                                 }}
                                             >
-                                                <EditIcon fontSize="small" color="primary" />
+                                                <EditIcon
+                                                    fontSize="small"
+                                                    color="primary"
+                                                    sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} // Smaller icon on mobile
+                                                />
                                             </IconButton>
                                             <IconButton
                                                 onClick={() => expense.id && handleDeleteExpense(expense.id)}
                                                 sx={{
                                                     backgroundColor: alpha(theme.palette.error.light, 0.1),
+                                                    width: { xs: 32, sm: 36 }, // Smaller on mobile
+                                                    height: { xs: 32, sm: 36 },
                                                     '&:hover': {
                                                         backgroundColor: alpha(theme.palette.error.light, 0.2),
                                                     }
                                                 }}
                                             >
-                                                <DeleteIcon fontSize="small" color="error" />
+                                                <DeleteIcon
+                                                    fontSize="small"
+                                                    color="error"
+                                                    sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} // Smaller icon on mobile
+                                                />
                                             </IconButton>
                                         </ListItemSecondaryAction>
-                                    </ListItem>
-                                ))}
+                                    </ListItem>))}
                             </List>
 
                             {/* Pagination */}

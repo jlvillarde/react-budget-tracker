@@ -8,19 +8,21 @@ import {
   Shield,
   Code,
   GetApp,
+  Check
 } from "@mui/icons-material"
 import { usePWA } from "../hooks/usePWA"
 
 export default function WelcomePage() {
   const theme = useTheme()
-  const { installStatus, installApp } = usePWA()
+  const { installStatus, installApp, markAsInstalled } = usePWA()
+
 
   const getInstallButtonProps = () => {
     switch (installStatus) {
       case 'installed':
         return {
-          text: 'App Installed ✓',
-          icon: <GetApp />,
+          text: 'App Installed',
+          icon: <Check />,
           disabled: true,
           color: theme.palette.success.main,
           onClick: () => { }
@@ -40,8 +42,26 @@ export default function WelcomePage() {
           disabled: false,
           color: theme.palette.primary.main,
           onClick: () => {
-            // Show instructions for manual installation
-            alert('To install this app:\n\n• Chrome: Menu → "Install Budget Tracker"\n• Safari: Share → "Add to Home Screen"\n• Edge: Menu → "Apps" → "Install this site as an app"');
+            // For iOS and other browsers that don't support beforeinstallprompt
+            const instructions = `To install this app:
+
+              📱 iPhone/iPad (Safari):
+              • Tap the Share button
+              • Select "Add to Home Screen"
+
+              🤖 Android (Chrome):
+              • Tap menu (⋮)
+              • Select "Add to Home Screen"
+
+              💻 Desktop (Chrome/Edge):
+              • Click menu
+              • Select "Install [App Name]"
+
+              After adding to home screen, this button will show as installed.`;
+
+            if (confirm(instructions + '\n\nDid you add the app to your home screen?')) {
+              markAsInstalled();
+            }
           }
         };
       default:
@@ -54,6 +74,7 @@ export default function WelcomePage() {
         };
     }
   };
+
 
   const installButtonProps = getInstallButtonProps();
 

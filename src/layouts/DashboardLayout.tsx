@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import {
     Box,
     Drawer,
@@ -9,7 +8,6 @@ import {
     Toolbar,
     List,
     Typography,
-    Divider,
     IconButton,
     ListItem,
     ListItemButton,
@@ -32,8 +30,6 @@ import {
     // TrendingUp as TrendingUpIcon,
     Settings as SettingsIcon,
     Notifications as NotificationsIcon,
-    AccountCircle,
-    Logout,
     Brightness4,
     Brightness7,
     ChevronLeft as ChevronLeftIcon,
@@ -73,6 +69,8 @@ const DashboardLayout: React.FC = () => {
     const [mobileOpen, setMobileOpen] = useState(false)
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [notificationAnchor, setNotificationAnchor] = useState<null | HTMLElement>(null)
+    const [notifications, setNotifications] = useState<any[]>([])
+    const [loadingNotifications, setLoadingNotifications] = useState(false)
 
     const drawerWidth = sidebarCollapsed ? 80 : 280
 
@@ -80,22 +78,77 @@ const DashboardLayout: React.FC = () => {
         setMobileOpen(!mobileOpen)
     }
 
-    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget)
-    }
 
+    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
     const handleProfileMenuClose = () => {
-        setAnchorEl(null)
-    }
+        setAnchorEl(null);
+    };
 
     const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
         setNotificationAnchor(event.currentTarget)
     }
 
-    const handleNotificationClose = () => {
-        setNotificationAnchor(null)
+    // Fetch notifications from /api/notifications on page load
+    React.useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const res = await fetch('/api/notifications', { method: 'GET' });
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    setNotifications(data);
+                } else if (data && Array.isArray(data.notifications)) {
+                    setNotifications(data.notifications);
+                } else {
+                    setNotifications([]);
+                }
+            } catch {
+                setNotifications([]);
+            }
+        };
+        fetchNotifications();
+    }, []);
+
+    // Fetch notifications again when menu is opened (for refresh)
+    React.useEffect(() => {
+        if (notificationAnchor) {
+            const fetchNotifications = async () => {
+                setLoadingNotifications(true);
+                try {
+                    const res = await fetch('/api/notifications', { method: 'GET' });
+                    const data = await res.json();
+                    if (Array.isArray(data)) {
+                        setNotifications(data);
+                    } else if (data && Array.isArray(data.notifications)) {
+                        setNotifications(data.notifications);
+                    } else {
+                        setNotifications([]);
+                    }
+                } catch {
+                    setNotifications([]);
+                } finally {
+                    setLoadingNotifications(false);
+                }
+            };
+            fetchNotifications();
+        }
+    }, [notificationAnchor]);
+
+    const handleNotificationClose = async () => {
+        setNotificationAnchor(null);
+        // Mark all notifications as read
+        try {
+            await fetch('/api/notifications/mark-all-as-read', { method: 'POST' });
+            // Update notifications state to set all as read
+            setNotifications((prev) => prev.map(n => ({ ...n, is_read: true })));
+        } catch {
+            // Ignore errors for now
+        }
     }
 
+
+    // Example logout handler (implement logout logic as needed)
     const handleLogout = async () => {
         handleProfileMenuClose()
         await logout()
@@ -384,13 +437,13 @@ const DashboardLayout: React.FC = () => {
                                 },
                             }}
                         >
-                            <Badge badgeContent={3} color="error">
+                            <Badge badgeContent={notifications.filter(n => !n.is_read).length} color="error">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
 
                         {/* Profile */}
-                        <IconButton onClick={handleProfileMenuOpen} sx={{ p: 0, ml: 1 }}>
+                        <IconButton sx={{ p: 0, ml: 1 }} onClick={handleProfileMenuOpen}>
                             <Avatar
                                 sx={{
                                     width: 40,
@@ -404,81 +457,38 @@ const DashboardLayout: React.FC = () => {
                                 {getUserInitials()}
                             </Avatar>
                         </IconButton>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={handleProfileMenuClose}
+                            PaperProps={{
+                                elevation: 0,
+                                sx: {
+                                    overflow: "visible",
+                                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                                    mt: 1.5,
+                                    backgroundColor: alpha(theme.palette.background.paper, 0.95),
+                                    backdropFilter: "blur(20px)",
+                                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                    minWidth: 180,
+                                },
+                            }}
+                        >
+                            <Box sx={{ p: 2, borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                    {user?.firstname || user?.email || "User"}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {user?.email}
+                                </Typography>
+                            </Box>
+                            {/* Add profile actions here, e.g. settings, logout */}
+                            {/* <MenuItem onClick={handleProfileMenuClose}>Profile</MenuItem> */}
+                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                        </Menu>
                     </Box>
                 </Toolbar>
             </AppBar>
-
-            {/* Profile Menu */}
-            <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleProfileMenuClose}
-                onClick={handleProfileMenuClose}
-                PaperProps={{
-                    elevation: 0,
-                    sx: {
-                        overflow: "visible",
-                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                        mt: 1.5,
-                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                        backdropFilter: "blur(20px)",
-                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                        "& .MuiAvatar-root": {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1,
-                        },
-                        "&:before": {
-                            content: '""',
-                            display: "block",
-                            position: "absolute",
-                            top: 0,
-                            right: 14,
-                            width: 10,
-                            height: 10,
-                            bgcolor: "background.paper",
-                            transform: "translateY(-50%) rotate(45deg)",
-                            zIndex: 0,
-                        },
-                    },
-                }}
-                transformOrigin={{ horizontal: "right", vertical: "top" }}
-                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-            >
-                <MenuItem onClick={handleProfileMenuClose}>
-                    <Avatar sx={{ backgroundColor: theme.palette.success.main }} src={user?.avatar}>
-                        {getUserInitials()}
-                    </Avatar>
-                    <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {user ? `${user.firstname} ${user.lastname}` : "User"}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            {user?.email || "user@example.com"}
-                        </Typography>
-                    </Box>
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => navigate("/dashboard/settings")}>
-                    <ListItemIcon>
-                        <AccountCircle fontSize="small" />
-                    </ListItemIcon>
-                    Profile
-                </MenuItem>
-                <MenuItem onClick={() => navigate("/dashboard/settings")}>
-                    <ListItemIcon>
-                        <SettingsIcon fontSize="small" />
-                    </ListItemIcon>
-                    Settings
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                        <Logout fontSize="small" />
-                    </ListItemIcon>
-                    Logout
-                </MenuItem>
-            </Menu>
 
             {/* Notification Menu */}
             <Menu
@@ -491,10 +501,12 @@ const DashboardLayout: React.FC = () => {
                         overflow: "visible",
                         filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                         mt: 1.5,
-                        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+                        backgroundColor: alpha(theme.palette.background.paper, 0.95),
                         backdropFilter: "blur(20px)",
                         border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                        minWidth: 300,
+                        minWidth: 340,
+                        maxWidth: 400,
+                        maxHeight: 700,
                     },
                 }}
             >
@@ -503,36 +515,79 @@ const DashboardLayout: React.FC = () => {
                         Notifications
                     </Typography>
                 </Box>
-                <MenuItem onClick={handleNotificationClose}>
-                    <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            Budget Alert
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            You've exceeded your dining budget by ₱30
-                        </Typography>
+                {loadingNotifications ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+                        <Typography variant="body2">Loading...</Typography>
                     </Box>
-                </MenuItem>
-                <MenuItem onClick={handleNotificationClose}>
-                    <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            New Transaction
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            ₱45.99 spent at Grocery Store
-                        </Typography>
+                ) : notifications.length === 0 ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+                        <Typography variant="body2" color="text.secondary">No notifications</Typography>
                     </Box>
-                </MenuItem>
-                <MenuItem onClick={handleNotificationClose}>
-                    <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            Monthly Report
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-                            Your monthly budget report is ready
-                        </Typography>
-                    </Box>
-                </MenuItem>
+                ) : (
+                    <List
+                        disablePadding
+                        sx={{
+                            minWidth: 320,
+                            maxWidth: 400,
+                            maxHeight: 480,
+                            overflowY: 'auto',
+                            // Custom scrollbar styles
+                            '&::-webkit-scrollbar': {
+                                width: '6px',
+                            },
+                            '&::-webkit-scrollbar-track': {
+                                background: alpha(theme.palette.divider, 0.1),
+                                borderRadius: '3px',
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                                background: alpha(theme.palette.primary.main, 0.25),
+                                borderRadius: '3px',
+                                '&:hover': {
+                                    background: alpha(theme.palette.primary.main, 0.4),
+                                },
+                            },
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: `${alpha(theme.palette.primary.main, 0.25)} ${alpha(theme.palette.divider, 0.1)}`,
+                        }}
+                    >
+                        {[...notifications]
+                            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                            .slice(0, 10)
+                            .map((notif) => (
+                                <ListItem
+                                    key={notif.id}
+                                    alignItems="flex-start"
+                                    component={ListItemButton}
+                                    onClick={handleNotificationClose}
+                                    sx={{
+                                        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.07)}`,
+                                        '&:hover': {
+                                            backgroundColor: alpha(theme.palette.primary.main, 0.13),
+                                        },
+                                        py: 1.5,
+                                        px: 2,
+                                    }}
+                                >
+                                    <Box sx={{ flexGrow: 1 }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                                            {notif.title}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mt: 0.5 }}>
+                                            {notif.detail}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ color: theme.palette.text.disabled, display: 'block', mt: 0.5 }}>
+                                            {notif.date}
+                                        </Typography>
+                                    </Box>
+                                    {!notif.is_read && (
+                                        <Box sx={{ ml: 2, mt: 0.5 }}>
+                                            <Badge color="error" variant="dot" />
+                                        </Box>
+                                    )}
+                                </ListItem>
+                            ))}
+                    </List>
+                )}
             </Menu>
 
             {/* Drawer */}
