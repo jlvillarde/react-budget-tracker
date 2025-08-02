@@ -195,6 +195,10 @@ const Analytics: React.FC = () => {
                 const oneYearAgo = new Date(today);
                 oneYearAgo.setFullYear(today.getFullYear() - 1);
                 return expenseDate >= oneYearAgo;
+            case "halfyear":
+                const sixMonthsAgo = new Date(today);
+                sixMonthsAgo.setMonth(today.getMonth() - 6);
+                return expenseDate >= sixMonthsAgo;
             case "all":
                 return true;
             default:
@@ -421,6 +425,7 @@ const Analytics: React.FC = () => {
                         <MenuItem value="week">Last 7 Days</MenuItem>
                         <MenuItem value="month">Last 30 Days</MenuItem>
                         <MenuItem value="quarter">Last 3 Months</MenuItem>
+                        <MenuItem value="halfyear">Last 6 Months</MenuItem>
                         <MenuItem value="year">Last Year</MenuItem>
                         <MenuItem value="all">All Time</MenuItem>
                     </Select>
@@ -510,8 +515,8 @@ const Analytics: React.FC = () => {
                             <LineChartIcon
                                 sx={{
                                     fontSize: isMobile ? 24 : 40,
-                                    color: theme.palette.primary.main,
                                     mb: 0.5,
+                                    color: theme.palette.primary.main,
                                 }}
                             />
                             <Typography

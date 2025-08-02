@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
 import {
     Box,
     Typography,
@@ -33,21 +34,29 @@ import {
     InputAdornment,
     OutlinedInput,
     Paper,
-    // Divider,
+    Divider,
     // Grid,
 } from "@mui/material"
 import {
     Add as AddIcon,
-    Edit as EditIcon,
     Delete as DeleteIcon,
     Receipt as ReceiptIcon,
     FilterList as FilterListIcon,
     Search as SearchIcon,
     Clear as ClearIcon,
+    Info as InfoIcon,
+    Edit as EditIcon,
     // TrendingUp as TrendingUpIcon,
     // Category as CategoryIcon,
     // ReceiptLong as ReceiptLongIcon,
 } from "@mui/icons-material"
+
+// Add type declaration for window
+declare global {
+    interface Window {
+        refreshNotifications?: () => void
+    }
+}
 
 interface ExpenseDTO {
     id?: number
@@ -58,6 +67,7 @@ interface ExpenseDTO {
 }
 
 const Expenses: React.FC = () => {
+    const navigate = useNavigate()
     const [expenses, setExpenses] = useState<ExpenseDTO[]>([])
     const [categories, setCategories] = useState<string[]>([])
     const [loading, setLoading] = useState(true)
@@ -80,6 +90,9 @@ const Expenses: React.FC = () => {
 
     const theme = useTheme()
 
+    const [budgetExceededData, setBudgetExceededData] = useState<any[]>([])
+    const [showBudgetModal, setShowBudgetModal] = useState(false)
+
     // Fetch categories
     const fetchCategories = async () => {
         try {
@@ -97,7 +110,6 @@ const Expenses: React.FC = () => {
             setLoading(false)
         }
     }
-
 
     // Fetch expenses
     const fetchExpenses = async () => {
@@ -133,6 +145,19 @@ const Expenses: React.FC = () => {
             })
 
             if (response.ok) {
+                const responseData = await response.json()
+
+                // Check if there are exceeded limits in the response
+                if (responseData.limit_exceeded && responseData.details && responseData.details.length > 0) {
+                    setBudgetExceededData(responseData.details)
+                    setShowBudgetModal(true)
+                }
+
+                // Refresh notifications after successful expense operation
+                if (window.refreshNotifications) {
+                    window.refreshNotifications()
+                }
+
                 await fetchExpenses()
                 handleCloseDialog()
             } else {
@@ -163,6 +188,19 @@ const Expenses: React.FC = () => {
             })
 
             if (response.ok) {
+                const responseData = await response.json()
+
+                // Check if there are exceeded limits in the response
+                if (responseData.limit_exceeded && responseData.details && responseData.details.length > 0) {
+                    setBudgetExceededData(responseData.details)
+                    setShowBudgetModal(true)
+                }
+
+                // Refresh notifications after successful expense operation
+                if (window.refreshNotifications) {
+                    window.refreshNotifications()
+                }
+
                 await fetchExpenses()
                 handleCloseDialog()
             } else {
@@ -241,33 +279,31 @@ const Expenses: React.FC = () => {
     // ...existing code...
     const filteredExpenses = useMemo(() => {
         // Sort by date descending (latest first)
-        const sorted = [...expenses].sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
+        const sorted = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         return sorted.filter((expense) => {
-            const matchesCategory = !filterCategory || expense.category === filterCategory;
+            const matchesCategory = !filterCategory || expense.category === filterCategory
             const matchesSearch =
                 !searchTerm ||
                 expense.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 expense.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                String(expense.amount).includes(searchTerm);
+                String(expense.amount).includes(searchTerm)
 
-            return matchesCategory && matchesSearch;
-        });
-    }, [expenses, filterCategory, searchTerm]);
+            return matchesCategory && matchesSearch
+        })
+    }, [expenses, filterCategory, searchTerm])
     // ...existing code...
 
     const paginatedExpenses = useMemo(() => {
-        const startIndex = (page - 1) * itemsPerPage;
-        return filteredExpenses.slice(startIndex, startIndex + itemsPerPage);
-    }, [filteredExpenses, page, itemsPerPage]);
+        const startIndex = (page - 1) * itemsPerPage
+        return filteredExpenses.slice(startIndex, startIndex + itemsPerPage)
+    }, [filteredExpenses, page, itemsPerPage])
 
     // Handle page changes
     const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
-        setPage(newPage);
+        setPage(newPage)
         // Scroll to top of expense list
-        window.scrollTo({ top: 400, behavior: 'smooth' });
-    };
+        window.scrollTo({ top: 400, behavior: "smooth" })
+    }
 
     useEffect(() => {
         fetchExpenses()
@@ -333,113 +369,6 @@ const Expenses: React.FC = () => {
                 </Alert>
             )}
 
-            {/* Summary Cards */}
-            {/* <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.success.main, 0.1),
-                            border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
-                        }}
-                    >
-                        <CardContent sx={{ textAlign: "center" }}>
-                            <ReceiptLongIcon
-                                sx={{
-                                    fontSize: 40,
-                                    color: theme.palette.success.main,
-                                    mb: 1,
-                                }}
-                            />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.success.main }}>
-                                ₱{totalExpenses.toFixed(2)}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                                Total Expenses
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Card
-                        elevation={0}
-                        sx={{
-                            backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                            border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                        }}
-                    >
-                        <CardContent sx={{ textAlign: "center" }}>
-                            <ReceiptIcon
-                                sx={{
-                                    fontSize: 40,
-                                    color: theme.palette.primary.main,
-                                    mb: 1,
-                                }}
-                            />
-                            <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
-                                {expenses.length}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                                Total Transactions
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid> */}
-
-            {/* <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Card
-                    elevation={0}
-                    sx={{
-                        backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                        border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
-                    }}
-                >
-                    <CardContent sx={{ textAlign: "center" }}>
-                        <CategoryIcon
-                            sx={{
-                                fontSize: 40,
-                                color: theme.palette.secondary.main,
-                                mb: 1,
-                            }}
-                        />
-                        <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.secondary.main }}>
-                            {Object.keys(expensesByCategory).length}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                            Categories Used
-                        </Typography>
-                    </CardContent>
-                </Card>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Card
-                    elevation={0}
-                    sx={{
-                        backgroundColor: alpha(theme.palette.warning.main, 0.1),
-                        border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
-                    }}
-                >
-                    <CardContent sx={{ textAlign: "center" }}>
-                        <TrendingUpIcon
-                            sx={{
-                                fontSize: 40,
-                                color: theme.palette.warning.main,
-                                mb: 1,
-                            }}
-                        />
-                        <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
-                            ₱{expenses.length > 0 ? (totalExpenses / expenses.length).toFixed(2) : "0.00"}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                            Average per Transaction
-                        </Typography>
-                    </CardContent>
-                </Card>
-            </Grid>
-        </Grid> */}
-
             {/* Filter Bar */}
             <Paper
                 elevation={0}
@@ -452,17 +381,17 @@ const Expenses: React.FC = () => {
                     borderRadius: 2,
                 }}
             >
-                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2, alignItems: { md: 'center' } }}>
-                    <FormControl variant="outlined" size="small" sx={{ minWidth: { xs: '100%', md: 200 } }}>
+                <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, alignItems: { md: "center" } }}>
+                    <FormControl variant="outlined" size="small" sx={{ minWidth: { xs: "100%", md: 200 } }}>
                         <InputLabel
                             shrink
                             sx={{
                                 backgroundColor: alpha(theme.palette.background.paper, 0.8),
                                 px: 0.5,
-                                transform: 'translate(14px, -9px) scale(0.75)',
-                                '&.Mui-focused': {
+                                transform: "translate(14px, -9px) scale(0.75)",
+                                "&.Mui-focused": {
                                     backgroundColor: alpha(theme.palette.background.paper, 0.9),
-                                }
+                                },
                             }}
                         >
                             Filter by Category
@@ -477,33 +406,31 @@ const Expenses: React.FC = () => {
                             notched
                             displayEmpty
                             renderValue={(selected) => {
-                                return selected ? selected : "All Categories";
+                                return selected ? selected : "All Categories"
                             }}
                             MenuProps={{
                                 PaperProps: {
                                     sx: {
                                         maxHeight: 300,
-                                        '&::-webkit-scrollbar': {
-                                            width: '8px',
+                                        "&::-webkit-scrollbar": {
+                                            width: "8px",
                                         },
-                                        '&::-webkit-scrollbar-track': {
+                                        "&::-webkit-scrollbar-track": {
                                             backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                                            borderRadius: '4px',
+                                            borderRadius: "4px",
                                         },
-                                        '&::-webkit-scrollbar-thumb': {
+                                        "&::-webkit-scrollbar-thumb": {
                                             backgroundColor: theme.palette.success.main,
-                                            borderRadius: '4px',
-                                            '&:hover': {
+                                            borderRadius: "4px",
+                                            "&:hover": {
                                                 backgroundColor: theme.palette.success.dark,
-                                            }
-                                        }
-                                    }
-                                }
+                                            },
+                                        },
+                                    },
+                                },
                             }}
                         >
-                            <MenuItem value="">
-                                All Categories
-                            </MenuItem>
+                            <MenuItem value="">All Categories</MenuItem>
                             {categories.map((category) => (
                                 <MenuItem key={category} value={category}>
                                     {category}
@@ -528,11 +455,7 @@ const Expenses: React.FC = () => {
                             endAdornment={
                                 searchTerm && (
                                     <InputAdornment position="end">
-                                        <IconButton
-                                            onClick={() => setSearchTerm('')}
-                                            edge="end"
-                                            size="small"
-                                        >
+                                        <IconButton onClick={() => setSearchTerm("")} edge="end" size="small">
                                             <ClearIcon fontSize="small" />
                                         </IconButton>
                                     </InputAdornment>
@@ -552,8 +475,8 @@ const Expenses: React.FC = () => {
                             setPage(1)
                         }}
                         sx={{
-                            display: (filterCategory || searchTerm) ? 'flex' : 'none',
-                            alignSelf: { xs: 'flex-end', md: 'center' },
+                            display: filterCategory || searchTerm ? "flex" : "none",
+                            alignSelf: { xs: "flex-end", md: "center" },
                             backgroundColor: theme.palette.primary.main,
                         }}
                     >
@@ -576,7 +499,7 @@ const Expenses: React.FC = () => {
                 <CardContent>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                         <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                            {filterCategory ? `${filterCategory} Expenses` : 'All Expenses'}
+                            {filterCategory ? `${filterCategory} Expenses` : "All Expenses"}
                         </Typography>
                         <Button
                             variant="contained"
@@ -602,33 +525,34 @@ const Expenses: React.FC = () => {
                             <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                                 {expenses.length === 0
                                     ? "Start tracking your expenses by adding your first transaction"
-                                    : "Try changing your search criteria or clear filters"
-                                }
+                                    : "Try changing your search criteria or clear filters"}
                             </Typography>
                         </Box>
                     ) : (
                         <>
-                            <List sx={{
-                                maxHeight: '60vh',
-                                overflowY: 'auto',
-                                '&::-webkit-scrollbar': {
-                                    width: '8px',
-                                },
-                                '&::-webkit-scrollbar-track': {
-                                    backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                                    borderRadius: '4px',
-                                },
-                                '&::-webkit-scrollbar-thumb': {
-                                    backgroundColor: theme.palette.success.main,
-                                    borderRadius: '4px',
-                                    border: `2px solid ${alpha(theme.palette.background.paper, 0.5)}`,
-                                    '&:hover': {
-                                        backgroundColor: theme.palette.success.dark,
-                                    }
-                                },
-                                scrollbarWidth: 'thin',
-                                scrollbarColor: `${theme.palette.success.main} ${alpha(theme.palette.background.paper, 0.5)}`
-                            }}>
+                            <List
+                                sx={{
+                                    maxHeight: "60vh",
+                                    overflowY: "auto",
+                                    "&::-webkit-scrollbar": {
+                                        width: "8px",
+                                    },
+                                    "&::-webkit-scrollbar-track": {
+                                        backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                                        borderRadius: "4px",
+                                    },
+                                    "&::-webkit-scrollbar-thumb": {
+                                        backgroundColor: theme.palette.success.main,
+                                        borderRadius: "4px",
+                                        border: `2px solid ${alpha(theme.palette.background.paper, 0.5)}`,
+                                        "&:hover": {
+                                            backgroundColor: theme.palette.success.dark,
+                                        },
+                                    },
+                                    scrollbarWidth: "thin",
+                                    scrollbarColor: `${theme.palette.success.main} ${alpha(theme.palette.background.paper, 0.5)}`,
+                                }}
+                            >
                                 {paginatedExpenses.map((expense) => (
                                     <ListItem
                                         key={expense.id}
@@ -637,11 +561,11 @@ const Expenses: React.FC = () => {
                                             borderRadius: 2,
                                             mb: 1,
                                             backgroundColor: alpha(theme.palette.background.paper, 0.5),
-                                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                                            '&:hover': {
+                                            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                                            "&:hover": {
                                                 boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.1)}`,
-                                                transform: 'translateY(-2px)',
-                                            }
+                                                transform: "translateY(-2px)",
+                                            },
                                         }}
                                     >
                                         <ListItemText
@@ -651,7 +575,7 @@ const Expenses: React.FC = () => {
                                                         variant="h6"
                                                         sx={{
                                                             fontWeight: 600,
-                                                            fontSize: { xs: '0.95rem', sm: '1.25rem' } // Smaller on mobile
+                                                            fontSize: { xs: "0.95rem", sm: "1.25rem" }, // Smaller on mobile
                                                         }}
                                                     >
                                                         {expense.description}
@@ -660,14 +584,16 @@ const Expenses: React.FC = () => {
                                                         label={expense.category}
                                                         size="small"
                                                         sx={{
-                                                            backgroundColor: filterCategory === expense.category
-                                                                ? alpha(theme.palette.success.main, 0.15)
-                                                                : alpha(theme.palette.primary.main, 0.1),
-                                                            color: filterCategory === expense.category
-                                                                ? theme.palette.success.dark
-                                                                : theme.palette.primary.main,
-                                                            fontSize: { xs: '0.7rem', sm: '0.8125rem' }, // Smaller on mobile
-                                                            height: { xs: 22, sm: 24 } // Smaller height on mobile
+                                                            backgroundColor:
+                                                                filterCategory === expense.category
+                                                                    ? alpha(theme.palette.success.main, 0.15)
+                                                                    : alpha(theme.palette.primary.main, 0.1),
+                                                            color:
+                                                                filterCategory === expense.category
+                                                                    ? theme.palette.success.dark
+                                                                    : theme.palette.primary.main,
+                                                            fontSize: { xs: "0.7rem", sm: "0.8125rem" }, // Smaller on mobile
+                                                            height: { xs: 22, sm: 24 }, // Smaller height on mobile
                                                         }}
                                                     />
                                                 </Box>
@@ -678,7 +604,7 @@ const Expenses: React.FC = () => {
                                                         variant="body2"
                                                         sx={{
                                                             color: theme.palette.text.secondary,
-                                                            fontSize: { xs: '0.75rem', sm: '0.875rem' } // Smaller on mobile
+                                                            fontSize: { xs: "0.75rem", sm: "0.875rem" }, // Smaller on mobile
                                                         }}
                                                     >
                                                         Date: {new Date(expense.date).toLocaleDateString()}
@@ -688,7 +614,7 @@ const Expenses: React.FC = () => {
                                                         sx={{
                                                             fontWeight: 600,
                                                             color: theme.palette.success.main,
-                                                            fontSize: { xs: '0.9rem', sm: '1rem' } // Smaller on mobile
+                                                            fontSize: { xs: "0.9rem", sm: "1rem" }, // Smaller on mobile
                                                         }}
                                                     >
                                                         ₱{Number(expense.amount).toFixed(2)}
@@ -705,15 +631,15 @@ const Expenses: React.FC = () => {
                                                     backgroundColor: alpha(theme.palette.primary.light, 0.1),
                                                     width: { xs: 32, sm: 36 }, // Smaller on mobile
                                                     height: { xs: 32, sm: 36 },
-                                                    '&:hover': {
+                                                    "&:hover": {
                                                         backgroundColor: alpha(theme.palette.primary.light, 0.2),
-                                                    }
+                                                    },
                                                 }}
                                             >
                                                 <EditIcon
                                                     fontSize="small"
                                                     color="primary"
-                                                    sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} // Smaller icon on mobile
+                                                    sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }} // Smaller icon on mobile
                                                 />
                                             </IconButton>
                                             <IconButton
@@ -722,30 +648,33 @@ const Expenses: React.FC = () => {
                                                     backgroundColor: alpha(theme.palette.error.light, 0.1),
                                                     width: { xs: 32, sm: 36 }, // Smaller on mobile
                                                     height: { xs: 32, sm: 36 },
-                                                    '&:hover': {
+                                                    "&:hover": {
                                                         backgroundColor: alpha(theme.palette.error.light, 0.2),
-                                                    }
+                                                    },
                                                 }}
                                             >
                                                 <DeleteIcon
                                                     fontSize="small"
                                                     color="error"
-                                                    sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} // Smaller icon on mobile
+                                                    sx={{ fontSize: { xs: "1rem", sm: "1.25rem" } }} // Smaller icon on mobile
                                                 />
                                             </IconButton>
                                         </ListItemSecondaryAction>
-                                    </ListItem>))}
+                                    </ListItem>
+                                ))}
                             </List>
 
                             {/* Pagination */}
                             {filteredExpenses.length > itemsPerPage && (
-                                <Box sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    pt: 3,
-                                    borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                                    mt: 2
-                                }}>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        pt: 3,
+                                        borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                        mt: 2,
+                                    }}
+                                >
                                     <Pagination
                                         count={Math.ceil(filteredExpenses.length / itemsPerPage)}
                                         page={page}
@@ -753,16 +682,16 @@ const Expenses: React.FC = () => {
                                         color="primary"
                                         size="large"
                                         sx={{
-                                            '& .MuiPaginationItem-root': {
-                                                fontSize: '1rem',
+                                            "& .MuiPaginationItem-root": {
+                                                fontSize: "1rem",
                                             },
-                                            '& .Mui-selected': {
+                                            "& .Mui-selected": {
                                                 backgroundColor: alpha(theme.palette.success.main, 0.15),
                                                 color: theme.palette.success.dark,
-                                                '&:hover': {
+                                                "&:hover": {
                                                     backgroundColor: alpha(theme.palette.success.main, 0.25),
-                                                }
-                                            }
+                                                },
+                                            },
                                         }}
                                     />
                                 </Box>
@@ -878,7 +807,117 @@ const Expenses: React.FC = () => {
             >
                 <AddIcon />
             </Fab>
-        </Box >
+
+            {/* Budget Exceeded Modal */}
+            <Dialog
+                open={showBudgetModal}
+                onClose={() => setShowBudgetModal(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        backgroundColor: alpha(theme.palette.background.paper, 0.95),
+                        backdropFilter: "blur(20px)",
+                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                        borderRadius: 2,
+                    },
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        pb: 2,
+                        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    }}
+                >
+                    <InfoIcon sx={{ color: theme.palette.text.secondary, fontSize: 24 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                        Budget Notification
+                    </Typography>
+                </DialogTitle>
+
+                <DialogContent sx={{ pt: 3, pb: 2 }}>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 3 }}>
+                        Your recent expense has exceeded the following budget limits:
+                    </Typography>
+
+                    <Stack spacing={2}>
+                        {budgetExceededData.map((limit, index) => (
+                            <Box key={index}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 2.5,
+                                        backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                                        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                                        borderRadius: 1.5,
+                                    }}
+                                >
+                                    <Typography
+                                        variant="subtitle1"
+                                        sx={{
+                                            fontWeight: 600,
+                                            color: theme.palette.text.primary,
+                                            mb: 1,
+                                        }}
+                                    >
+                                        {limit.title}
+                                    </Typography>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{
+                                            color: theme.palette.text.secondary,
+                                            lineHeight: 1.5,
+                                        }}
+                                    >
+                                        {limit.detail}
+                                    </Typography>
+                                </Paper>
+                                {index < budgetExceededData.length - 1 && <Divider sx={{ my: 1, opacity: 0.3 }} />}
+                            </Box>
+                        ))}
+                    </Stack>
+                </DialogContent>
+
+                <DialogActions
+                    sx={{
+                        p: 3,
+                        pt: 2,
+                        gap: 1,
+                        borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    }}
+                >
+                    <Button
+                        onClick={() => setShowBudgetModal(false)}
+                        sx={{
+                            color: theme.palette.text.secondary,
+                            "&:hover": {
+                                backgroundColor: alpha(theme.palette.text.secondary, 0.05),
+                            },
+                        }}
+                    >
+                        Dismiss
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setShowBudgetModal(false)
+                            navigate("/dashboard/settings")
+                        }}
+                        variant="contained"
+                        sx={{
+                            backgroundColor: theme.palette.primary.main,
+                            "&:hover": {
+                                backgroundColor: theme.palette.primary.dark,
+                            },
+                        }}
+                    >
+                        Adjust Settings
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
     )
 }
 

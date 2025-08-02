@@ -78,75 +78,98 @@ const DashboardLayout: React.FC = () => {
         setMobileOpen(!mobileOpen)
     }
 
-
     const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
+        setAnchorEl(event.currentTarget)
+    }
     const handleProfileMenuClose = () => {
-        setAnchorEl(null);
-    };
+        setAnchorEl(null)
+    }
 
     const handleNotificationOpen = (event: React.MouseEvent<HTMLElement>) => {
         setNotificationAnchor(event.currentTarget)
     }
 
-    // Fetch notifications from /api/notifications on page load
+    // Add state for notification refresh
+    const [notificationRefreshTrigger, setNotificationRefreshTrigger] = useState(0)
+
+    // Function to refresh notifications (can be called from other components)
+    const refreshNotifications = React.useCallback(() => {
+        setNotificationRefreshTrigger((prev) => prev + 1)
+    }, [])
+
+    // Expose refresh function globally (you can use context or window object)
+    React.useEffect(() => {
+        window.refreshNotifications = refreshNotifications
+        return () => {
+            delete window.refreshNotifications
+        }
+    }, [refreshNotifications])
+
+    // Fetch notifications from /api/notifications on page load and when triggered
     React.useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const res = await fetch('/api/notifications', { method: 'GET' });
-                const data = await res.json();
+                const res = await fetch("/api/notifications", { method: "GET" })
+                const data = await res.json()
                 if (Array.isArray(data)) {
-                    setNotifications(data);
+                    setNotifications(data)
                 } else if (data && Array.isArray(data.notifications)) {
-                    setNotifications(data.notifications);
+                    setNotifications(data.notifications)
                 } else {
-                    setNotifications([]);
+                    setNotifications([])
                 }
             } catch {
-                setNotifications([]);
+                setNotifications([])
             }
-        };
-        fetchNotifications();
-    }, []);
+        }
+        fetchNotifications()
+    }, [notificationRefreshTrigger]) // Add dependency on refresh trigger
+
+    // Add periodic notification checking (every 30 seconds)
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            refreshNotifications()
+        }, 30000) // Check every 30 seconds
+
+        return () => clearInterval(interval)
+    }, [refreshNotifications])
 
     // Fetch notifications again when menu is opened (for refresh)
     React.useEffect(() => {
         if (notificationAnchor) {
             const fetchNotifications = async () => {
-                setLoadingNotifications(true);
+                setLoadingNotifications(true)
                 try {
-                    const res = await fetch('/api/notifications', { method: 'GET' });
-                    const data = await res.json();
+                    const res = await fetch("/api/notifications", { method: "GET" })
+                    const data = await res.json()
                     if (Array.isArray(data)) {
-                        setNotifications(data);
+                        setNotifications(data)
                     } else if (data && Array.isArray(data.notifications)) {
-                        setNotifications(data.notifications);
+                        setNotifications(data.notifications)
                     } else {
-                        setNotifications([]);
+                        setNotifications([])
                     }
                 } catch {
-                    setNotifications([]);
+                    setNotifications([])
                 } finally {
-                    setLoadingNotifications(false);
+                    setLoadingNotifications(false)
                 }
-            };
-            fetchNotifications();
+            }
+            fetchNotifications()
         }
-    }, [notificationAnchor]);
+    }, [notificationAnchor])
 
     const handleNotificationClose = async () => {
-        setNotificationAnchor(null);
+        setNotificationAnchor(null)
         // Mark all notifications as read
         try {
-            await fetch('/api/notifications/mark-all-as-read', { method: 'POST' });
+            await fetch("/api/notifications/mark-all-as-read", { method: "POST" })
             // Update notifications state to set all as read
-            setNotifications((prev) => prev.map(n => ({ ...n, is_read: true })));
+            setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
         } catch {
             // Ignore errors for now
         }
     }
-
 
     // Example logout handler (implement logout logic as needed)
     const handleLogout = async () => {
@@ -437,7 +460,7 @@ const DashboardLayout: React.FC = () => {
                                 },
                             }}
                         >
-                            <Badge badgeContent={notifications.filter(n => !n.is_read).length} color="error">
+                            <Badge badgeContent={notifications.filter((n) => !n.is_read).length} color="error">
                                 <NotificationsIcon />
                             </Badge>
                         </IconButton>
@@ -516,12 +539,14 @@ const DashboardLayout: React.FC = () => {
                     </Typography>
                 </Box>
                 {loadingNotifications ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}>
                         <Typography variant="body2">Loading...</Typography>
                     </Box>
                 ) : notifications.length === 0 ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
-                        <Typography variant="body2" color="text.secondary">No notifications</Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                            No notifications
+                        </Typography>
                     </Box>
                 ) : (
                     <List
@@ -530,23 +555,23 @@ const DashboardLayout: React.FC = () => {
                             minWidth: 320,
                             maxWidth: 400,
                             maxHeight: 480,
-                            overflowY: 'auto',
+                            overflowY: "auto",
                             // Custom scrollbar styles
-                            '&::-webkit-scrollbar': {
-                                width: '6px',
+                            "&::-webkit-scrollbar": {
+                                width: "6px",
                             },
-                            '&::-webkit-scrollbar-track': {
+                            "&::-webkit-scrollbar-track": {
                                 background: alpha(theme.palette.divider, 0.1),
-                                borderRadius: '3px',
+                                borderRadius: "3px",
                             },
-                            '&::-webkit-scrollbar-thumb': {
+                            "&::-webkit-scrollbar-thumb": {
                                 background: alpha(theme.palette.primary.main, 0.25),
-                                borderRadius: '3px',
-                                '&:hover': {
+                                borderRadius: "3px",
+                                "&:hover": {
                                     background: alpha(theme.palette.primary.main, 0.4),
                                 },
                             },
-                            scrollbarWidth: 'thin',
+                            scrollbarWidth: "thin",
                             scrollbarColor: `${alpha(theme.palette.primary.main, 0.25)} ${alpha(theme.palette.divider, 0.1)}`,
                         }}
                     >
@@ -561,7 +586,7 @@ const DashboardLayout: React.FC = () => {
                                     onClick={handleNotificationClose}
                                     sx={{
                                         borderBottom: `1px solid ${alpha(theme.palette.divider, 0.07)}`,
-                                        '&:hover': {
+                                        "&:hover": {
                                             backgroundColor: alpha(theme.palette.primary.main, 0.13),
                                         },
                                         py: 1.5,
@@ -575,7 +600,10 @@ const DashboardLayout: React.FC = () => {
                                         <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mt: 0.5 }}>
                                             {notif.detail}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: theme.palette.text.disabled, display: 'block', mt: 0.5 }}>
+                                        <Typography
+                                            variant="caption"
+                                            sx={{ color: theme.palette.text.disabled, display: "block", mt: 0.5 }}
+                                        >
                                             {notif.date}
                                         </Typography>
                                     </Box>
